@@ -14,7 +14,7 @@ and don't show untracked files in the status to ignore everything else in
 ```Shell
 git clone --bare https://github.com/NarvinSingh/dotfiles $HOME/.dotfiles
 alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-alias dfcf='df checkout -f'
+alias dfd='df checkout -f'
 df config --local status.showUntrackedFiles no
 ```
 
@@ -23,7 +23,7 @@ df config --local status.showUntrackedFiles no
 Load dotfiles, overwriting changes in `$HOME`
 
 ```Shell
-dfcf
+dfd
 ```
 
 `df` is `git` for the local dotfiles repo, so you can run any git commands, for
