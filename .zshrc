@@ -73,9 +73,12 @@ alias l='ls -al'
 alias la='ls -A'
 alias ll='ls -l'
 
+# git
+alias gl='git log --pretty="%Cblue%s%Creset%n%b"'
+
 # dotfiles
 alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-alias dfd='df checkout -f'
-alias dfl='df ls-tree -r --name-only'
-alias dflh='dfl HEAD'
+alias dfc='df checkout -f'
+alias dfl='df log --pretty="%Cblue%s%Creset%n%b"'
+alias dfls='df ls-tree -r --name-only HEAD'
 
