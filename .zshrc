@@ -76,6 +76,9 @@ alias ll='ls -l'
 # git
 alias gl='git log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
 
+# vim
+alias vvim='vim -u NONE'
+
 # dotfiles
 alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias dfc='df checkout -f'
