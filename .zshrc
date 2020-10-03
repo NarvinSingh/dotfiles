@@ -75,6 +75,7 @@ alias ll='ls -l'
 
 # git
 alias gl='git log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
+alias gls='git ls-tree -r --name-only HEAD'
 
 # vim
 alias vvim='vim -u NONE'
