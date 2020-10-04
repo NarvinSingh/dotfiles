@@ -3,20 +3,26 @@
 "
 
 " Cursors
-let s:tmux_pre = "\<Esc>Ptmux;\<Esc>"
-let s:tmux_post = "\<Esc>\\"
-let s:cursor_normal = "\<Esc>[2 q"
-let s:cursor_insert = "\<Esc>[5 q"
-let s:cursor_replace = "\<Esc>[3 q"
+if &term =~ 'xterm'
+  let s:cursor_normal = "\<Esc>[2 q\<Esc>]12;DeepSkyBlue1\x7"
+  let s:cursor_insert = "\<Esc>[5 q\<Esc>]12;DeepSkyBlue1\x7"
+  let s:cursor_replace = "\<Esc>[3 q\<Esc>]12;DeepSkyBlue1\x7"
+  let s:cursor_reset = s:cursor_insert
 
-if exists('$TMUX')
-  let &t_EI .= s:tmux_pre . s:cursor_normal . s:tmux_post
-  let &t_SI .= s:tmux_pre . s:cursor_insert . s:tmux_post
-  let &t_SR .= s:tmux_pre . s:cursor_replace . s:tmux_post
-else
-  let &t_EI .= s:cursor_normal
-  let &t_SI .= s:cursor_insert
-  let &t_SR .= s:cursor_replace
+  autocmd VimEnter * silent execute '!printf "' . s:cursor_normal . '"'
+  autocmd VimLeave * silent execute '!printf "' . s:cursor_reset . '"'
+
+  if exists('$TMUX')
+    let s:tmux_pre = "\<Esc>Ptmux;\<Esc>"
+    let s:tmux_post = "\<Esc>\\"
+    let &t_EI .= s:tmux_pre . s:cursor_normal . s:tmux_post
+    let &t_SI .= s:tmux_pre . s:cursor_insert . s:tmux_post
+    let &t_SR .= s:tmux_pre . s:cursor_replace . s:tmux_post
+  else
+    let &t_EI .= s:cursor_normal
+    let &t_SI .= s:cursor_insert
+    let &t_SR .= s:cursor_replace
+  endif
 endif
 
 " Colors
