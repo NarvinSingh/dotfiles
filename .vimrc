@@ -179,6 +179,10 @@ set number relativenumber cursorline colorcolumn=81
 " Leader
 let mapleader = ' '
 
+" Normal mode
+inoremap ii <C-o>:stopinsert<CR>
+vnoremap ii <Esc>
+
 " Navigate splits
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
