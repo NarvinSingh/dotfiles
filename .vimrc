@@ -172,6 +172,9 @@ syntax on
 " Visual Elements
 set number relativenumber cursorline colorcolumn=81
 
+" Behavior
+set shiftwidth=2
+
 "
 " Mappings
 "
@@ -179,9 +182,9 @@ set number relativenumber cursorline colorcolumn=81
 " Leader
 let mapleader = ' '
 
-" Normal mode
-inoremap ii <C-o>:stopinsert<CR>
-vnoremap ii <Esc>
+" Enter normal mode
+inoremap kj <Esc>
+inoremap jk <Esc>
 
 " Navigate splits
 nnoremap <C-j> <C-w>j
