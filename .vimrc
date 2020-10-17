@@ -1,8 +1,8 @@
-"
 " Appearance
-"
+" ==========
 
 " Cursors
+" -------
 if &term =~ 'xterm'
   let s:cursor_normal = "\<Esc>[2 q\<Esc>]12;DeepSkyBlue1\x7"
   let s:cursor_insert = "\<Esc>[5 q\<Esc>]12;DeepSkyBlue1\x7"
@@ -26,6 +26,7 @@ if &term =~ 'xterm'
 endif
 
 " Colors
+" ------
 let s:bwc_plain = 15
 let s:bwc_snow = 15
 let s:bwc_coal = 16
@@ -70,7 +71,7 @@ endfunction
 
 set background=dark
 
-" General/UI {{{
+" ### General/UI
 call s:SetColorGroup('Normal', s:bwc_plain, s:bwc_blackgravel)
 call s:SetColorGroup('Folded', s:bwc_mediumgravel, 'bg', 'none')
 call s:SetColorGroup('VertSplit', s:bwc_lightgravel, 'bg', 'none')
@@ -98,21 +99,18 @@ call s:SetColorGroup('ModeMsg', s:bwc_dirtyblonde, '', 'bold')
 call s:SetColorGroup('Question', s:bwc_dirtyblonde, '', 'bold')
 call s:SetColorGroup('WarningMsg', s:bwc_dress, '', 'bold')
 call s:SetColorGroup('Tag', '', '', 'bold')
-" }}}
 
-" Gutter {{{
+" ### Gutter
 call s:SetColorGroup('LineNr', s:bwc_mediumgravel, s:bwc_gutter)
 call s:SetColorGroup('SignColumn', '', s:bwc_gutter)
 call s:SetColorGroup('FoldColumn', s:bwc_mediumgravel, s:bwc_gutter)
-" }}}
 
-" Cursor {{{
+" ### Cursor
 call s:SetColorGroup('Cursor', s:bwc_coal, s:bwc_tardis, 'bold')
 call s:SetColorGroup('vCursor', s:bwc_coal, s:bwc_tardis, 'bold')
 call s:SetColorGroup('iCursor', s:bwc_coal, s:bwc_tardis, 'none')
-" }}}
 
-" Syntax highlighting {{{
+" ### Syntax highlighting
 call s:SetColorGroup('Special', s:bwc_plain)
 call s:SetColorGroup('Comment', s:bwc_gravel)
 call s:SetColorGroup('Todo', s:bwc_snow, 'bg', 'bold')
@@ -144,62 +142,223 @@ call s:SetColorGroup('Exception', s:bwc_lime, '', 'bold')
 call s:SetColorGroup('Error', s:bwc_snow, s:bwc_taffy, 'bold')
 call s:SetColorGroup('Debug', s:bwc_snow, '', 'bold')
 call s:SetColorGroup('Ignore', s:bwc_gravel, '', '')
-" }}}
 
-" Completion Menu {{{
+" ### Completion Menu
 call s:SetColorGroup('Pmenu', s:bwc_plain, s:bwc_deepergravel)
 call s:SetColorGroup('PmenuSel', s:bwc_coal, s:bwc_tardis, 'bold')
 call s:SetColorGroup('PmenuSbar', '', s:bwc_deepergravel)
 call s:SetColorGroup('PmenuThumb', s:bwc_brightgravel)
-" }}}
 
-" Diffs {{{
+" ### Diffs
 call s:SetColorGroup('DiffDelete', s:bwc_coal, s:bwc_coal)
 call s:SetColorGroup('DiffAdd', '', s:bwc_deepergravel)
 call s:SetColorGroup('DiffChange', '', s:bwc_darkgravel)
 call s:SetColorGroup('DiffText', s:bwc_snow, s:bwc_deepergravel, 'bold')
-" }}}
 
-" Spelling {{{
+" ### Spelling
 call s:SetColorGroup('SpellCap', s:bwc_dalespale, 'bg', 'undercurl,bold')
 call s:SetColorGroup('SpellBad', '', 'bg', 'undercurl')
 call s:SetColorGroup('SpellLocal', '', '', 'undercurl')
 call s:SetColorGroup('SpellRare', '', '', 'undercurl')
-" }}}
-
-syntax on
 
 " Visual Elements
+" ---------------
+syntax on
+
 set number relativenumber cursorline colorcolumn=81
 
 " Behavior
+" ========
+
+" Folds
+" -----
+let s:num_messages = 0
+let s:max_messages = 400
+let s:last_fold_level = 0
+let s:last_last_fold_level = 0
+
+function GetMarkdownishFoldLevel(lnum, ...)
+  let l:prefix = a:0 >= 1 ? a:1 : ''
+  let l:prefix_len = len(l:prefix)
+  let l:line_p1 = getline(v:lnum + 1)
+
+  if l:line_p1[0 : l:prefix_len] == l:prefix . '='
+    if s:num_messages < s:max_messages
+      echom '>1 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    let s:last_fold_level = 1
+    return '>1'
+  endif
+
+  if l:line_p1[0 : l:prefix_len] == l:prefix . '-'
+    if s:num_messages < s:max_messages
+      echom '>2 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    let s:last_fold_level = 2
+    return '>2'
+  endif
+
+  let l:line = getline(v:lnum)
+
+  if l:line[0 : l:prefix_len + 3] == l:prefix . '### '
+    if s:num_messages < s:max_messages
+      echom '>3 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    let s:last_last_fold_level = s:last_fold_level
+    let s:last_fold_level = 3
+    return '>3'
+  endif
+
+  if l:line[0 : l:prefix_len + 4] == l:prefix . '#### '
+    if s:num_messages < s:max_messages
+      echom '>4 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    let s:last_last_fold_level = s:last_fold_level
+    let s:last_fold_level = 4
+    return '>4'
+  endif
+
+  if l:line[0 : l:prefix_len + 5] == l:prefix . '##### '
+    if s:num_messages < s:max_messages
+      echom '>5 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    let s:last_last_fold_level = s:last_fold_level
+    let s:last_fold_level = 5
+    return '>5'
+  endif
+
+  if l:line[0 : l:prefix_len + 6] == l:prefix . '###### '
+    if s:num_messages < s:max_messages
+      echom '>6 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    let s:last_last_fold_level = s:last_fold_level
+    let s:last_fold_level = 6
+    return '>6'
+  endif
+
+  if l:line[0 : l:prefix_len] == l:prefix . '('
+    if s:num_messages < s:max_messages
+      echom '>7 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    if s:last_fold_level < 7
+      let s:last_last_fold_level = s:last_fold_level
+    endif
+    let s:last_fold_level = 7
+    return '>7'
+  endif
+
+  if l:line[0 : l:prefix_len] == l:prefix . ')'
+    if s:num_messages < s:max_messages
+      echom '<7 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    let s:last_fold_level = s:last_last_fold_level
+    return '<7'
+  endif
+
+  if s:num_messages < s:max_messages
+    echom s:last_fold_level . ' ' . getline(v:lnum)[0:20]
+    let s:num_messages += 1
+  endif
+  return s:last_fold_level
+endfunction
+
+" ( Old implementation of folding for markdown that has been generalized to
+"   any filetype and expanded to handle 6 heading levels plus a 7th
+"   parenthetical heading level by GetMarkdownishFoldLevel
+function FoldLevelMarkdown(lnum)
+  let l:line_p1 = getline(v:lnum + 1)
+
+  if l:line_p1[0:2] == '==='
+    if s:num_messages < s:max_messages
+      echom '>1 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    let s:last_fold_level = 1
+    return '>1'
+  endif
+
+  if l:line_p1[0:2] == '---'
+    if s:num_messages < s:max_messages
+      echom '>2 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    let s:last_fold_level = 2
+    return '>2'
+  endif
+
+  let l:line = getline(v:lnum)
+
+  if l:line[0:2] == '###'
+    if s:num_messages < s:max_messages
+      echom '>3 ' . getline(v:lnum)[0:20]
+      let s:num_messages += 1
+    endif
+    let s:last_fold_level = 3
+    return '>3'
+  endif
+
+  if s:num_messages < s:max_messages
+    echom s:last_fold_level . ' ' . getline(v:lnum)[0:20]
+    let s:num_messages += 1
+  endif
+  return s:last_fold_level
+endfunction
+" )
+
+" ( Initial attempt at coming up with a foldexpr
+" set foldmethod=expr
+" set foldexpr=getline(v:lnum-1)=~'^\"\\{40,}'&&getline(v:lnum-2)[0:1]=='\"\ '?'>1':1
+" set foldexpr=getline(v:lnum+1)[0:2]=='---'?'>1'?getline(v:lnum)[0:2]=='###'?'>2':2
+" )
+
+augroup filetype_markdown
+  autocmd!
+  autocmd Filetype markdown set foldmethod=expr
+  autocmd Filetype markdown set foldexpr=GetMarkdownishFoldLevel(v:lnum)
+  autocmd Filetype markdown set foldlevel=2
+augroup END
+
+augroup filetype_vim
+  autocmd!
+  autocmd Filetype vim set foldmethod=expr
+  autocmd Filetype vim set foldexpr=GetMarkdownishFoldLevel(v:lnum,'\"\ ')
+  autocmd Filetype vim set foldlevel=1
+augroup END
+
 set shiftwidth=2
 
-"
 " Mappings
-"
+" --------
 
-" Leader
+" ### Leader
 let mapleader = ' '
 
-" Enter normal mode
+" ### Enter normal mode
 inoremap kj <Esc>
 inoremap jk <Esc>
 
-" Navigate splits
+" ### Navigate splits
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
-" Edit .vimrc
+" ### Edit .vimrc
 nnoremap <silent> <Leader>ev :vsplit $MYVIMRC<CR>
 
-" Save and source current file
+" ### Save and source current file
 nnoremap <silent> <Leader>ss :w<CR>
   \ :source %<CR>
   \ :echo 'Sourced ' . bufname('%')<CR>
 
-" Trim trailing whitespace
+" ### Trim trailing whitespace
 nnoremap <Leader>tw :%s/\s\+$//gc<CR>
 
