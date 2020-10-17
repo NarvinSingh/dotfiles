@@ -172,81 +172,63 @@ set number relativenumber cursorline colorcolumn=81
 
 " Folds
 " -----
-let s:num_messages = 0
-let s:max_messages = 400
 let s:last_fold_level = 0
 let s:last_last_fold_level = 0
 
-function GetMarkdownishFoldLevel(lnum, ...)
+function GetFoldLevelByHeading(lnum, ...)
   let l:prefix = a:0 >= 1 ? a:1 : ''
   let l:prefix_len = len(l:prefix)
-  let l:line_p1 = getline(v:lnum + 1)
+  let l:line = getline(v:lnum)
 
-  if l:line_p1[0 : l:prefix_len] == l:prefix . '='
-    if s:num_messages < s:max_messages
-      echom '>1 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
+  if l:line[0 : l:prefix_len + 1] == l:prefix . '# '
+    let s:last_last_fold_level = s:last_fold_level
     let s:last_fold_level = 1
     return '>1'
   endif
 
-  if l:line_p1[0 : l:prefix_len] == l:prefix . '-'
-    if s:num_messages < s:max_messages
-      echom '>2 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
+  let l:line_p1 = getline(v:lnum + 1)
+
+  if l:line_p1[0 : l:prefix_len] == l:prefix . '='
+    let s:last_fold_level = 1
+    return '>1'
+  endif
+
+  if l:line[0 : l:prefix_len + 2] == l:prefix . '## '
+    let s:last_last_fold_level = s:last_fold_level
     let s:last_fold_level = 2
     return '>2'
   endif
 
-  let l:line = getline(v:lnum)
+  if l:line_p1[0 : l:prefix_len] == l:prefix . '-'
+    let s:last_fold_level = 2
+    return '>2'
+  endif
 
   if l:line[0 : l:prefix_len + 3] == l:prefix . '### '
-    if s:num_messages < s:max_messages
-      echom '>3 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
     let s:last_last_fold_level = s:last_fold_level
     let s:last_fold_level = 3
     return '>3'
   endif
 
   if l:line[0 : l:prefix_len + 4] == l:prefix . '#### '
-    if s:num_messages < s:max_messages
-      echom '>4 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
     let s:last_last_fold_level = s:last_fold_level
     let s:last_fold_level = 4
     return '>4'
   endif
 
   if l:line[0 : l:prefix_len + 5] == l:prefix . '##### '
-    if s:num_messages < s:max_messages
-      echom '>5 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
     let s:last_last_fold_level = s:last_fold_level
     let s:last_fold_level = 5
     return '>5'
   endif
 
   if l:line[0 : l:prefix_len + 6] == l:prefix . '###### '
-    if s:num_messages < s:max_messages
-      echom '>6 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
     let s:last_last_fold_level = s:last_fold_level
     let s:last_fold_level = 6
     return '>6'
   endif
 
   if l:line[0 : l:prefix_len] == l:prefix . '('
-    if s:num_messages < s:max_messages
-      echom '>7 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
     if s:last_fold_level < 7
       let s:last_last_fold_level = s:last_fold_level
     endif
@@ -255,81 +237,24 @@ function GetMarkdownishFoldLevel(lnum, ...)
   endif
 
   if l:line[0 : l:prefix_len] == l:prefix . ')'
-    if s:num_messages < s:max_messages
-      echom '<7 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
     let s:last_fold_level = s:last_last_fold_level
     return '<7'
   endif
 
-  if s:num_messages < s:max_messages
-    echom s:last_fold_level . ' ' . getline(v:lnum)[0:20]
-    let s:num_messages += 1
-  endif
   return s:last_fold_level
 endfunction
-
-" ( Old implementation of folding for markdown that has been generalized to
-"   any filetype and expanded to handle 6 heading levels plus a 7th
-"   parenthetical heading level by GetMarkdownishFoldLevel
-function FoldLevelMarkdown(lnum)
-  let l:line_p1 = getline(v:lnum + 1)
-
-  if l:line_p1[0:2] == '==='
-    if s:num_messages < s:max_messages
-      echom '>1 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
-    let s:last_fold_level = 1
-    return '>1'
-  endif
-
-  if l:line_p1[0:2] == '---'
-    if s:num_messages < s:max_messages
-      echom '>2 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
-    let s:last_fold_level = 2
-    return '>2'
-  endif
-
-  let l:line = getline(v:lnum)
-
-  if l:line[0:2] == '###'
-    if s:num_messages < s:max_messages
-      echom '>3 ' . getline(v:lnum)[0:20]
-      let s:num_messages += 1
-    endif
-    let s:last_fold_level = 3
-    return '>3'
-  endif
-
-  if s:num_messages < s:max_messages
-    echom s:last_fold_level . ' ' . getline(v:lnum)[0:20]
-    let s:num_messages += 1
-  endif
-  return s:last_fold_level
-endfunction
-" )
-
-" ( Initial attempt at coming up with a foldexpr
-" set foldmethod=expr
-" set foldexpr=getline(v:lnum-1)=~'^\"\\{40,}'&&getline(v:lnum-2)[0:1]=='\"\ '?'>1':1
-" set foldexpr=getline(v:lnum+1)[0:2]=='---'?'>1'?getline(v:lnum)[0:2]=='###'?'>2':2
-" )
 
 augroup filetype_markdown
   autocmd!
   autocmd Filetype markdown set foldmethod=expr
-  autocmd Filetype markdown set foldexpr=GetMarkdownishFoldLevel(v:lnum)
+  autocmd Filetype markdown set foldexpr=GetFoldLevelByHeading(v:lnum)
   autocmd Filetype markdown set foldlevel=2
 augroup END
 
 augroup filetype_vim
   autocmd!
   autocmd Filetype vim set foldmethod=expr
-  autocmd Filetype vim set foldexpr=GetMarkdownishFoldLevel(v:lnum,'\"\ ')
+  autocmd Filetype vim set foldexpr=GetFoldLevelByHeading(v:lnum,'\"\ ')
   autocmd Filetype vim set foldlevel=1
 augroup END
 
