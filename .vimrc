@@ -163,15 +163,28 @@ call s:SetColorGroup('SpellRare', '', '', 'undercurl')
 
 " Visual Elements
 " ---------------
+
+" ### Syntax highlighting
 syntax on
 
-set number relativenumber cursorline colorcolumn=81
+" ### Line numbers
+set number relativenumber
+
+" ### Cursor line and column
+set cursorline colorcolumn=81
+
 
 " Behavior
 " ========
 
+" Indentation
+" -----------
+set shiftwidth=2
+
 " Folds
 " -----
+
+" ### GetFoldLevelByHeading
 let s:last_fold_level = 0
 let s:last_last_fold_level = 0
 
@@ -244,6 +257,7 @@ function GetFoldLevelByHeading(lnum, ...)
   return s:last_fold_level
 endfunction
 
+" ### markdown
 augroup filetype_markdown
   autocmd!
   autocmd Filetype markdown set foldmethod=expr
@@ -251,14 +265,13 @@ augroup filetype_markdown
   autocmd Filetype markdown set foldlevel=2
 augroup END
 
+" ### vim
 augroup filetype_vim
   autocmd!
   autocmd Filetype vim set foldmethod=expr
   autocmd Filetype vim set foldexpr=GetFoldLevelByHeading(v:lnum,'\"\ ')
   autocmd Filetype vim set foldlevel=1
 augroup END
-
-set shiftwidth=2
 
 " Mappings
 " --------
