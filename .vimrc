@@ -187,71 +187,82 @@ set shiftwidth=2
 " ### GetFoldLevelByHeading
 let s:last_fold_level = 0
 let s:last_last_fold_level = 0
+let s:is_code_block = 0
 
 function GetFoldLevelByHeading(lnum, ...)
-  let l:prefix = a:0 >= 1 ? a:1 : ''
-  let l:prefix_len = len(l:prefix)
-  let l:line = getline(v:lnum)
+  let l:has_code_blocks = a:0 >= 2 ? a:2 : 0
+  let l:line = getline(a:lnum)
 
-  if l:line[0 : l:prefix_len + 1] == l:prefix . '# '
-    let s:last_last_fold_level = s:last_fold_level
-    let s:last_fold_level = 1
-    return '>1'
+  if l:has_code_blocks && l:line[0 : 2] ==# '```'
+    let s:is_code_block = !s:is_code_block
   endif
 
-  let l:line_p1 = getline(v:lnum + 1)
+  if !s:is_code_block
+    let l:prefix = a:0 >= 1 ? a:1 : ''
+    let l:prefix_len = len(l:prefix)
+    let l:line_p1 = getline(a:lnum + 1)
 
-  if l:line_p1[0 : l:prefix_len] == l:prefix . '='
-    let s:last_fold_level = 1
-    return '>1'
-  endif
+    if l:prefix_len ==# 0 || l:line_p1[0 : l:prefix_len - 1] ==# l:prefix
 
-  if l:line[0 : l:prefix_len + 2] == l:prefix . '## '
-    let s:last_last_fold_level = s:last_fold_level
-    let s:last_fold_level = 2
-    return '>2'
-  endif
+      if l:line_p1[l:prefix_len : ] =~ '^=\+$'
+        let s:last_fold_level = 1
+        return '>1'
+      endif
 
-  if l:line_p1[0 : l:prefix_len] == l:prefix . '-'
-    let s:last_fold_level = 2
-    return '>2'
-  endif
-
-  if l:line[0 : l:prefix_len + 3] == l:prefix . '### '
-    let s:last_last_fold_level = s:last_fold_level
-    let s:last_fold_level = 3
-    return '>3'
-  endif
-
-  if l:line[0 : l:prefix_len + 4] == l:prefix . '#### '
-    let s:last_last_fold_level = s:last_fold_level
-    let s:last_fold_level = 4
-    return '>4'
-  endif
-
-  if l:line[0 : l:prefix_len + 5] == l:prefix . '##### '
-    let s:last_last_fold_level = s:last_fold_level
-    let s:last_fold_level = 5
-    return '>5'
-  endif
-
-  if l:line[0 : l:prefix_len + 6] == l:prefix . '###### '
-    let s:last_last_fold_level = s:last_fold_level
-    let s:last_fold_level = 6
-    return '>6'
-  endif
-
-  if l:line[0 : l:prefix_len] == l:prefix . '('
-    if s:last_fold_level < 7
-      let s:last_last_fold_level = s:last_fold_level
+      if l:line_p1[l:prefix_len : ] =~ '^-\+$'
+        let s:last_fold_level = 2
+        return '>2'
+      endif
     endif
-    let s:last_fold_level = 7
-    return '>7'
-  endif
 
-  if l:line[0 : l:prefix_len] == l:prefix . ')'
-    let s:last_fold_level = s:last_last_fold_level
-    return '<7'
+    if l:line[0 : l:prefix_len + 1] ==# l:prefix . '# '
+      let s:last_last_fold_level = s:last_fold_level
+      let s:last_fold_level = 1
+      return '>1'
+    endif
+
+    if l:line[0 : l:prefix_len + 2] ==# l:prefix . '## '
+      let s:last_last_fold_level = s:last_fold_level
+      let s:last_fold_level = 2
+      return '>2'
+    endif
+
+    if l:line[0 : l:prefix_len + 3] ==# l:prefix . '### '
+      let s:last_last_fold_level = s:last_fold_level
+      let s:last_fold_level = 3
+      return '>3'
+    endif
+
+    if l:line[0 : l:prefix_len + 4] ==# l:prefix . '#### '
+      let s:last_last_fold_level = s:last_fold_level
+      let s:last_fold_level = 4
+      return '>4'
+    endif
+
+    if l:line[0 : l:prefix_len + 5] ==# l:prefix . '##### '
+      let s:last_last_fold_level = s:last_fold_level
+      let s:last_fold_level = 5
+      return '>5'
+    endif
+
+    if l:line[0 : l:prefix_len + 6] ==# l:prefix . '###### '
+      let s:last_last_fold_level = s:last_fold_level
+      let s:last_fold_level = 6
+      return '>6'
+    endif
+
+    if l:line[0 : l:prefix_len] ==# l:prefix . '('
+      if s:last_fold_level < 7
+        let s:last_last_fold_level = s:last_fold_level
+      endif
+      let s:last_fold_level = 7
+      return '>7'
+    endif
+
+    if l:line[0 : l:prefix_len] ==# l:prefix . ')'
+      let s:last_fold_level = s:last_last_fold_level
+      return '<7'
+    endif
   endif
 
   return s:last_fold_level
@@ -261,7 +272,7 @@ endfunction
 augroup filetype_markdown
   autocmd!
   autocmd Filetype markdown set foldmethod=expr
-  autocmd Filetype markdown set foldexpr=GetFoldLevelByHeading(v:lnum)
+  autocmd Filetype markdown set foldexpr=GetFoldLevelByHeading(v:lnum,'',1)
   autocmd Filetype markdown set foldlevel=2
 augroup END
 
