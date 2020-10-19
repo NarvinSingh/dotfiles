@@ -179,7 +179,12 @@ set cursorline colorcolumn=81
 
 " Indentation
 " -----------
+" See https://vim.fandom.com/wiki/Indenting_source_code
+
+" ### Use 2 spaces
+set expandtab
 set shiftwidth=2
+set softtabstop=2
 
 " Folds
 " -----
