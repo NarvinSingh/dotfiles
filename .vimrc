@@ -199,7 +199,7 @@ let s:last_fold_level = 0
 let s:last_last_fold_level = 0
 let s:is_code_block = 0
 
-function GetFoldLevelByHeading(lnum, ...)
+function! GetFoldLevelByHeading(lnum, ...)
   let l:has_code_blocks = a:0 >= 2 ? a:2 : 0
   let l:line = getline(a:lnum)
 
