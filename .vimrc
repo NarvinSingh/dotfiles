@@ -22,6 +22,8 @@ function! s:SetColorGroup(group, fg, ...)
 endfunction
 
 " ### Palette
+set background=dark
+
 let s:bwc_plain = 15
 let s:bwc_snow = 15
 let s:bwc_coal = 16
@@ -47,8 +49,6 @@ let s:bwc_toffee = 137
 " let s:bwc_darkroast = 95
 let s:bwc_gutter = s:bwc_blackgravel
 let s:bwc_tabline = s:bwc_blackgravel
-
-set background=dark
 
 " ### General/UI
 call s:SetColorGroup('Normal', s:bwc_plain, s:bwc_blackgravel)
