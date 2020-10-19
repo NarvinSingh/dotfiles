@@ -11,27 +11,27 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
-#
 # Prompt
-#
+# ======
 
 # Colors
-CLR_BLACK=0   
-CLR_MAROON=1   
-CLR_GREEN=2   
-CLR_OLIVE=3   
-CLR_NAVY=4   
-CLR_PURPLE=5   
-CLR_TEAL=6   
-CLR_SILVER=7   
-CLR_GREY=8   
-CLR_RED=9   
-CLR_LIME=10  
-CLR_YELLOW=11  
-CLR_BLUE=12  
-CLR_FUCHSIA=13  
-CLR_AQUA=14  
-CLR_WHITE=15  
+# ------
+CLR_BLACK=0
+CLR_MAROON=1
+CLR_GREEN=2
+CLR_OLIVE=3
+CLR_NAVY=4
+CLR_PURPLE=5
+CLR_TEAL=6
+CLR_SILVER=7
+CLR_GREY=8
+CLR_RED=9
+CLR_LIME=10
+CLR_YELLOW=11
+CLR_BLUE=12
+CLR_FUCHSIA=13
+CLR_AQUA=14
+CLR_WHITE=15
 
 PS_CLR_LAST_OK=$CLR_LIME
 PS_CLR_LAST_ERR=$CLR_RED
@@ -63,24 +63,27 @@ PS_SYM="%F{$PS_CLR_SYM}%#%f"
 setopt prompt_subst
 PS1="$PS_LAST ${PS_USER}${PS_SEP}${PS_HOST} ${PS_DIR}${PS_GIT} $PS_SYM "
 
-#
 # Aliases
-#
+# =======
 
 # ls
+# --
 alias ls='ls --color=auto'
 alias l='ls -al'
 alias la='ls -A'
 alias ll='ls -l'
 
 # git
+# ---
 alias gl='git log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
 alias gls='git ls-tree -r --name-only HEAD'
 
 # vim
+# ---
 alias vvim='vim -u NONE'
 
 # dotfiles
+# --------
 alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias dfc='df checkout -f'
 alias dfl='df log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
