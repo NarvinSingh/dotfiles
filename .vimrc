@@ -186,6 +186,9 @@ set expandtab
 set shiftwidth=2
 set softtabstop=2
 
+" ### Auto indent
+set autoindent
+
 " Folds
 " -----
 
