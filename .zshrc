@@ -84,8 +84,8 @@ alias vvim='vim -u NONE'
 
 # dotfiles
 # --------
-alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-alias dfc='df checkout -f'
-alias dfl='df log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
-alias dfls='df ls-tree -r --name-only HEAD'
+alias cfg='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias cfgc='cfg checkout -f'
+alias cfgl='cfg log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
+alias cfgls='cfg ls-tree -r --name-only HEAD'
 
