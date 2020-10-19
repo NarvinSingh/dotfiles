@@ -1,32 +1,27 @@
 " Appearance
 " ==========
 
-" Cursors
-" -------
-if &term =~ 'xterm'
-  let s:cursor_normal = "\<Esc>[2 q\<Esc>]12;DeepSkyBlue1\x7"
-  let s:cursor_insert = "\<Esc>[5 q\<Esc>]12;DeepSkyBlue1\x7"
-  let s:cursor_replace = "\<Esc>[3 q\<Esc>]12;DeepSkyBlue1\x7"
-  let s:cursor_reset = s:cursor_insert
-
-  autocmd VimEnter * silent execute '!printf "' . s:cursor_normal . '"'
-  autocmd VimLeave * silent execute '!printf "' . s:cursor_reset . '"'
-
-  if exists('$TMUX')
-    let s:tmux_pre = "\<Esc>Ptmux;\<Esc>"
-    let s:tmux_post = "\<Esc>\\"
-    let &t_EI .= s:tmux_pre . s:cursor_normal . s:tmux_post
-    let &t_SI .= s:tmux_pre . s:cursor_insert . s:tmux_post
-    let &t_SR .= s:tmux_pre . s:cursor_replace . s:tmux_post
-  else
-    let &t_EI .= s:cursor_normal
-    let &t_SI .= s:cursor_insert
-    let &t_SR .= s:cursor_replace
-  endif
-endif
-
 " Colors
 " ------
+
+" ### SetColorGroup
+function! s:SetColorGroup(group, fg, ...)
+  let hi_cmd = 'highlight ' . a:group
+
+  if strlen(a:fg)
+    let hi_cmd .= ' ctermfg=' . a:fg
+  endif
+  if a:0 >= 1 && strlen(a:1)
+    let hi_cmd .= ' ctermbg=' . a:1
+  endif
+  if a:0 >= 2 && strlen(a:2)
+    let hi_cmd .= ' cterm=' . a:2
+  endif
+
+  execute hi_cmd
+endfunction
+
+" ### Palette
 let s:bwc_plain = 15
 let s:bwc_snow = 15
 let s:bwc_coal = 16
@@ -52,22 +47,6 @@ let s:bwc_toffee = 137
 " let s:bwc_darkroast = 95
 let s:bwc_gutter = s:bwc_blackgravel
 let s:bwc_tabline = s:bwc_blackgravel
-
-function! s:SetColorGroup(group, fg, ...)
-  let hi_cmd = 'highlight ' . a:group
-
-  if strlen(a:fg)
-    let hi_cmd .= ' ctermfg=' . a:fg
-  endif
-  if a:0 >= 1 && strlen(a:1)
-    let hi_cmd .= ' ctermbg=' . a:1
-  endif
-  if a:0 >= 2 && strlen(a:2)
-    let hi_cmd .= ' cterm=' . a:2
-  endif
-
-  execute hi_cmd
-endfunction
 
 set background=dark
 
@@ -164,6 +143,30 @@ call s:SetColorGroup('SpellRare', '', '', 'undercurl')
 " Visual Elements
 " ---------------
 
+" ### Cursors
+
+if &term =~ 'xterm'
+  let s:cursor_normal = "\<Esc>[2 q\<Esc>]12;DeepSkyBlue1\x7"
+  let s:cursor_insert = "\<Esc>[5 q\<Esc>]12;DeepSkyBlue1\x7"
+  let s:cursor_replace = "\<Esc>[3 q\<Esc>]12;DeepSkyBlue1\x7"
+  let s:cursor_reset = s:cursor_insert
+
+  autocmd VimEnter * silent execute '!printf "' . s:cursor_normal . '"'
+  autocmd VimLeave * silent execute '!printf "' . s:cursor_reset . '"'
+
+  if exists('$TMUX')
+    let s:tmux_pre = "\<Esc>Ptmux;\<Esc>"
+    let s:tmux_post = "\<Esc>\\"
+    let &t_EI .= s:tmux_pre . s:cursor_normal . s:tmux_post
+    let &t_SI .= s:tmux_pre . s:cursor_insert . s:tmux_post
+    let &t_SR .= s:tmux_pre . s:cursor_replace . s:tmux_post
+  else
+    let &t_EI .= s:cursor_normal
+    let &t_SI .= s:cursor_insert
+    let &t_SR .= s:cursor_replace
+  endif
+endif
+
 " ### Syntax highlighting
 syntax on
 
@@ -172,7 +175,6 @@ set number relativenumber
 
 " ### Cursor line and column
 set cursorline colorcolumn=81
-
 
 " Behavior
 " ========
