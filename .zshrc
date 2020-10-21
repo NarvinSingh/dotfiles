@@ -89,3 +89,8 @@ alias cfgc='cfg checkout -f'
 alias cfgl='cfg log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
 alias cfgls='cfg ls-tree -r --name-only HEAD'
 
+# gitadd
+# ------
+alias gitadd='$HOME/project/linux/gitadd'
+alias cfgadd='gitadd --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
