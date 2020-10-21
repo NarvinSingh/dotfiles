@@ -11,6 +11,25 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
+# Environment
+# ===========
+
+# XDG Base Directory Specification
+# --------------------------------
+
+# See
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_CACHE_HOME="${HOME}/.cache"
+
+# VIM Redirection
+# ---------------
+
+# See https://tlvince.com/vim-respect-xdg
+
+export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC'
+
 # Prompt
 # ======
 
