@@ -1,49 +1,58 @@
-# dotfiles
+Dotfiles Bare Repo
+==================
 
-From https://www.atlassian.com/git/tutorials/dotfiles. Use a bare git repo to
-track, version control and deploy (checkout) your dotfiles. There is no need for
-extra tooling or symlinks, and different branches can be used for different
-computers.
+See [How to store dotfiles](https://www.atlassian.com/git/tutorials/dotfiles).
 
-## Installation
+Use a bare git repo to track, version control and deploy (checkout) your
+dotfiles. There is no need for extra tooling or symlinks, and different
+branches can be used for different computers.
 
-Clone the dotfiles repo, add aliases for commands to work with the local repo,
-and don't show untracked files in the status to ignore everything else in
-`$HOME`.
+Installation
+------------
+
+1. Clone the dotfiles repo.
+2. Add aliases for commands to work with the local repo.
+3. Don't show untracked files in `git status` to ignore everything else in
+   `$HOME`.
 
 ```Shell
 git clone --bare https://github.com/NarvinSingh/dotfiles $HOME/.dotfiles
-alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-alias dfd='df checkout -f'
-df config --local status.showUntrackedFiles no
+alias cfg='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias cfgc='cfg checkout -f'
+cfg config --local status.showUntrackedFiles no
 ```
 
-## Usage
+Usage
+-----
 
-Load dotfiles, overwriting changes in `$HOME`
+### Load dotfiles
+
+This will overwrite the dotfiles in `$HOME`.
 
 ```Shell
-dfd
+cfgc
 ```
 
-`df` is `git` for the local dotfiles repo, so you can run any git commands, for
-example:
+### Run git commands
 
-Add a dotfile
+Use the `cfg` alias in place of `git` to maintian the dotfiles repo,
+for example:
+
+#### Add a dotfile
 
 ```Shell
-df add <dotfile>
+cfg add <dotfile>
 ```
 
-Check status
+#### Check status
 
 ```Shell
-df status
+cfg status
 ```
 
-Commit changes
+#### Commit changes
 
 ```Shell
-df commit -m "Added <dotfile>"
+cfg commit -m "Added <dotfile>"
 ```
 
