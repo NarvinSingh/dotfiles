@@ -297,7 +297,6 @@ augroup END
 " ### zsh
 augroup filetype_zsh
   autocmd!
-  echom 'zsh detected'
   autocmd Filetype zsh set foldmethod=expr
   autocmd Filetype zsh set foldexpr=GetFoldLevelByHeading(v:lnum,'\#\ ')
   autocmd Filetype zsh set foldlevel=1
