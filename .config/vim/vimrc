@@ -1,3 +1,26 @@
+" Environment
+" ===========
+
+" Redirect VIM files
+" ------------------
+
+" $MYVIMRC will also be redirected, but this is done by setting the $VIMINIT
+" environment variable before starting VIM, e.g., by exporting $VIMINIT from
+" .zshrc. See https://tlvince.com/vim-respect-xdg.
+
+" ### Swap Files
+set directory=$XDG_CACHE_HOME/vim,/tmp
+
+" ### Backup Directory
+set backupdir=$XDG_CACHE_HOME/vim,/tmp
+
+" ### Viminfo File
+" h: viminfo-file-name
+set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
+
+" ### Runtime Path
+set runtimepath=$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after,$VIM,$VIMRUNTIME
+
 " Appearance
 " ==========
 
