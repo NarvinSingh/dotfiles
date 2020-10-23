@@ -8,7 +8,6 @@ bindkey -v
 zstyle :compinstall filename '/home/narvin/.zshrc'
 
 autoload -Uz compinit
-compinit
 # End of lines added by compinstall
 
 # Environment
@@ -22,6 +21,14 @@ compinit
 
 export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME="${HOME}/.cache"
+
+# Compinit Redirection
+# --------------------
+
+# See
+# https://unix.stackexchange.com/questions/391641/separate-path-for-zcompdump-files
+
+compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
 
 # VIM Redirection
 # ---------------
