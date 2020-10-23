@@ -44,6 +44,11 @@ export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC'
 # Non-ideal solution of setting tmux to an alias the specifies the config file
 alias tmux='tmux -f ~/.config/tmux/tmux.conf'
 
+# Less Redirection
+# ----------------
+mkdir -p "${XDG_CACHE_HOME}"/less
+export LESSHISTFILE="${XDG_CACHE_HOME}/less/history"
+
 # Prompt
 # ======
 
