@@ -2,7 +2,7 @@
   name = Narvin Singh
   email = Narvin.A.Singh@gmail.com
 [credential]
-  helper = store
+  helper = store --file ~/.cache/git/credentials
 [core]
   editor = vim
 [alias]
