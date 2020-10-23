@@ -8,10 +8,10 @@
 [alias]
   al = !~/project/linux/gitadd
   br = branch
-  cm = commit
-  co = checkout
+  co = commit
+  ch = checkout
   ds = diff --staged
   s = status
   ss = status -s
-  us = reset HEAD --
+  rh = reset HEAD --
 
