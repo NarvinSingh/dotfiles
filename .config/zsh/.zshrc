@@ -28,6 +28,7 @@ export XDG_CACHE_HOME="${HOME}/.cache"
 # See
 # https://unix.stackexchange.com/questions/391641/separate-path-for-zcompdump-files
 
+mkdir -p "${XDG_CACHE_HOME}/zsh"
 compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
 
 # VIM Redirection
