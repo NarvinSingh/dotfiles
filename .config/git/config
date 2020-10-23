@@ -7,11 +7,12 @@
   editor = vim
 [alias]
   al = !~/project/linux/gitadd
-  br = branch
-  co = commit
+  b = branch
   ch = checkout
+  co = commit
+  d = diff
   ds = diff --staged
-  s = status
-  ss = status -s
   rh = reset HEAD --
+  ss = status -s
+  s = status
 
