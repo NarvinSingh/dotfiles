@@ -1,7 +1,4 @@
 # Lines configured by zsh-newuser-install
-HISTFILE=~/.zsh_history
-HISTSIZE=1000
-SAVEHIST=1000
 bindkey -v
 # End of lines configured by zsh-newuser-install
 # The following lines were added by compinstall
@@ -13,7 +10,7 @@ autoload -Uz compinit
 # Environment
 # ===========
 
-# XDG Base Directory Specification
+# XDG Base Directory Specificatio
 # --------------------------------
 
 # See
@@ -49,6 +46,13 @@ alias tmux='tmux -f ~/.config/tmux/tmux.conf'
 # ----------------
 mkdir -p "${XDG_CACHE_HOME}"/less
 export LESSHISTFILE="${XDG_CACHE_HOME}/less/history"
+
+# History
+# =======
+mkdir -p "${XDG_DATA_HOME}/zsh"
+HISTFILE="${XDG_DATA_HOME}/zsh/history"
+HISTSIZE=1000
+SAVEHIST=1000
 
 # Prompt
 # ======
