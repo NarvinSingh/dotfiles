@@ -12,6 +12,8 @@
   co = commit
   d = diff
   ds = diff --staged
+  l = log
+  ls = ls-tree -r --name-only HEAD
   rh = reset HEAD --
   ss = status -s
   s = status
