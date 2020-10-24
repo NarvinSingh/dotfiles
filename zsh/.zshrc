@@ -119,7 +119,6 @@ alias ll='ls -l'
 # git
 # ---
 alias gl='git log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
-alias gls='git ls-tree -r --name-only HEAD'
 
 # vim
 # ---
@@ -130,10 +129,4 @@ alias vvim='vim -u NONE'
 alias cfg='/usr/bin/git --git-dir=$HOME/.config/dotfiles/ --work-tree=$HOME/.config'
 alias cfgc='cfg checkout -f'
 alias cfgl='cfg log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
-alias cfgls='cfg ls-tree -r --name-only HEAD'
-
-# gitadd
-# ------
-alias gitadd='$HOME/project/linux/gitadd'
-alias cfgadd='gitadd --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
