@@ -204,6 +204,7 @@ set cursorline colorcolumn=81
 
 " Indentation
 " -----------
+
 " See https://vim.fandom.com/wiki/Indenting_source_code
 
 " ### Use 2 spaces
@@ -315,6 +316,14 @@ augroup filetype_vim
   autocmd Filetype vim set foldmethod=expr
   autocmd Filetype vim set foldexpr=GetFoldLevelByHeading(v:lnum,'\"\ ')
   autocmd Filetype vim set foldlevel=1
+augroup END
+
+" ### sh
+augroup filetype_sh
+  autocmd!
+  autocmd Filetype sh set foldmethod=expr
+  autocmd Filetype sh set foldexpr=GetFoldLevelByHeading(v:lnum,'\#\ ')
+  autocmd Filetype sh set foldlevel=1
 augroup END
 
 " ### zsh
