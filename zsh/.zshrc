@@ -137,9 +137,3 @@ alias t='tmux'
 alias v='vim'
 alias vv='v -u NONE'
 
-# dotfiles
-# --------
-alias cfg='/usr/bin/git --git-dir=$HOME/.config/dotfiles/ --work-tree=$HOME/.config'
-alias cfgc='cfg checkout -f'
-alias cfgl='cfg log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
-

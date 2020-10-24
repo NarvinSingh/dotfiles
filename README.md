@@ -1,58 +1,68 @@
-Dotfiles Bare Repo
-==================
+User-Specific Configuration Files Repo
+======================================
 
 See [How to store dotfiles](https://www.atlassian.com/git/tutorials/dotfiles).
 
-Use a bare git repo to track, version control and deploy (checkout) your
-dotfiles. There is no need for extra tooling or symlinks, and different
-branches can be used for different computers.
+Create a git repo in the XDG base directory `$HOME/.config` to track, version
+control and deploy (checkout) your user-specific configuration. There is no
+need for extra tooling or symlinks, and different branches can be used for
+different computers.
+
+All of the applications for which you want to track configuration files must
+store their configuration files in `$HOME/.config`. Otherwise, a bare repo
+in `$HOME` can be used to track files relative to `$HOME`. In that case, an
+alias for git that sets `--git-dir` to the repo directory and `--work-tree`
+to `$HOME` could then be used to manage the repo. For example:
+
+```Shell
+git clone --bare https://github.com/NarvinSingh/dotfiles "${HOME}"/.dotfiles
+alias cfg='/usr/bin/git --git-dir ${HOME}/.dotfiles --work-tree ${HOME}'
+cfg add <dotfile>
+cfg status
+cfg commit -m "Added <dotfile>"
+```
 
 Installation
 ------------
 
-1. Clone the dotfiles repo.
-2. Add aliases for commands to work with the local repo.
-3. Don't show untracked files in `git status` to ignore everything else in
-   the work tree.
+1. Clone the dotfiles repo into `$HOME/.config`.
+2. Don't show untracked files in `git status` to ignore everything else in
+   `$HOME/.config`.
 
 ```Shell
-git clone --bare https://github.com/NarvinSingh/dotfiles $HOME/.config/dotfiles
-alias cfg='/usr/bin/git --git-dir=$HOME/.config/dotfiles/ --work-tree=$HOME/.config'
-alias cfgc='cfg checkout -f'
-cfg config --local status.showUntrackedFiles no
+git clone https://github.com/NarvinSingh/dotfiles "${HOME}"/.config
+cd  "${HOME}"/.config
+git config --local status.showUntrackedFiles no
 ```
 
 Usage
 -----
 
-### Load dotfiles
+### Load config files
 
-This will overwrite the dotfiles in the work tree.
+This will overwrite the files if they exist in `$HOME\.config`.
 
 ```Shell
-cfgc
+git checkout -f
 ```
 
-### Run git commands
-
-Use the `cfg` alias in place of `git` to maintian the dotfiles repo,
-for example:
-
-#### Add a dotfile
+### Add a config file
 
 ```Shell
-cfg add <dotfile>
+git add <dotfile>
 ```
 
-#### Check status
+### Check status
+
+Untracked files will not be shown.
 
 ```Shell
-cfg status
+git status
 ```
 
-#### Commit changes
+### Commit changes
 
 ```Shell
-cfg commit -m "Added <dotfile>"
+git commit -m "Added <dotfile>"
 ```
 
