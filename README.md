@@ -13,11 +13,11 @@ Installation
 1. Clone the dotfiles repo.
 2. Add aliases for commands to work with the local repo.
 3. Don't show untracked files in `git status` to ignore everything else in
-   `$HOME`.
+   the work tree.
 
 ```Shell
-git clone --bare https://github.com/NarvinSingh/dotfiles $HOME/.dotfiles
-alias cfg='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+git clone --bare https://github.com/NarvinSingh/dotfiles $HOME/.config/dotfiles
+alias cfg='/usr/bin/git --git-dir=$HOME/.config/dotfiles/ --work-tree=$HOME/.config'
 alias cfgc='cfg checkout -f'
 cfg config --local status.showUntrackedFiles no
 ```
@@ -27,7 +27,7 @@ Usage
 
 ### Load dotfiles
 
-This will overwrite the dotfiles in `$HOME`.
+This will overwrite the dotfiles in the work tree.
 
 ```Shell
 cfgc
