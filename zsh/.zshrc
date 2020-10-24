@@ -124,10 +124,6 @@ alias cp='cp -i'
 # --
 alias rm='rm -i'
 
-# git
-# ---
-alias gl='git log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
-
 # tmux
 # ----
 alias t='tmux'

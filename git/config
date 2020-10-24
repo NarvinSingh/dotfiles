@@ -13,6 +13,7 @@
   d = diff
   ds = diff --staged
   l = log
+  lp = log --pretty='%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b' --stat
   ls = ls-tree -r --name-only HEAD
   rh = reset HEAD --
   ss = status -s
