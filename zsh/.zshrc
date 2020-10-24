@@ -127,7 +127,7 @@ alias vvim='vim -u NONE'
 
 # dotfiles
 # --------
-alias cfg='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias cfg='/usr/bin/git --git-dir=$HOME/.config/dotfiles/ --work-tree=$HOME/.config'
 alias cfgc='cfg checkout -f'
 alias cfgl='cfg log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
 alias cfgls='cfg ls-tree -r --name-only HEAD'
