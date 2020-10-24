@@ -116,13 +116,26 @@ alias l='ls -al'
 alias la='ls -A'
 alias ll='ls -l'
 
+# cp
+# --
+alias cp='cp -i'
+
+# rm
+# --
+alias rm='rm -i'
+
 # git
 # ---
 alias gl='git log --pretty="%n%C(yellow)%>(7,trunc)%h %Cgreen%s%w(,,8)%+b" --stat'
 
+# tmux
+# ----
+alias t='tmux'
+
 # vim
 # ---
-alias vvim='vim -u NONE'
+alias v='vim'
+alias vv='v -u NONE'
 
 # dotfiles
 # --------
