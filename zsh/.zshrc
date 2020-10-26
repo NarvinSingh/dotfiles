@@ -162,7 +162,7 @@ print_git_status() {
       stats+=$(print_git_xy_stats 'd' "${num_dx}" "${num_dy}")
       stats+=$(print_git_xy_stats 'r' "${num_rx}" "${num_ry}")
       stats+=$(print_git_xy_stats 'c' "${num_cx}" "${num_cy}")
-      stats+=$(print_git_xy_stats 'u' "${num_ux}" "${num_uy}")
+      stats+=$(print_git_xy_stats 'u' "${num_u}")
 
       # Output the stats
       printf ' ' # Print the leading spacer
