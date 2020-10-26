@@ -90,6 +90,8 @@ PS_CLR_BG_GIT_C=${CLR_GREEN}
 PS_CLR_GIT_D=${CLR_WHITE}
 PS_CLR_BG_GIT_D=${CLR_MAROON}
 PS_CLR_GIT_S=${CLR_MAROON}
+PS_CLR_GIT_S_X=${CLR_GREEN}
+PS_CLR_GIT_S_Y=${CLR_MAROON}
 PS_CLR_BG_GIT_S=${CLR_WHITE}
 PS_CLR_SYM=${CLR_GREY}
 
@@ -101,6 +103,24 @@ git_path=$(which git)
 if [[ "$?" -ne 0 ]]; then
   git_path=''
 fi
+
+get_xy_stats() {
+  code="${1}"
+  num_x="${2}"
+  num_y="${3}"
+  res=''
+
+  if [[ "${num_x}" -gt 0 || "${num_y}" -gt 0 ]]; then
+    res+=" %%F{${PS_CLR_GIT_S}}${code}%%f"
+
+    if [[ "${num_x}" -gt 0 ]]; then res+="%%F{${PS_CLR_GIT_S_X}}${num_x}%%f"; fi
+    if [[ "${num_y}" -gt 0 ]]; then
+      res+="%%F{${PS_CLR_GIT_S}}:%%f%%F{${PS_CLR_GIT_S_Y}}${num_y}%%f"
+    fi
+  fi
+
+  printf '%s' "${res}"
+}
 
 get_git_status() {
   # Git is installed
@@ -115,29 +135,34 @@ get_git_status() {
 
       # Parse ahead and behind
       ab=$(printf '%s' "${stat}" | grep '^# branch.ab ' -m 1)
-      ah=$(printf "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
-      bh=$(printf "${ab}" | cut -d '-' -f 2)
+      a=$(printf "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
+      b=$(printf "${ab}" | cut -d '-' -f 2)
 
       # Parse the changes
       num_a=$(printf '%s' "${stat}" | grep '^[12u] A' -c)
-      num_m=$(printf '%s' "${stat}" | grep -E '^[12u] (M|.M)' -c)
-      num_d=$(printf '%s' "${stat}" | grep -E '^[12u] (D|.D)' -c)
-      num_r=$(printf '%s' "${stat}" | grep -E '^[12u] (R|.R)' -c)
-      num_c=$(printf '%s' "${stat}" | grep -E '^[12u] (C|.C)' -c)
+      num_mx=$(printf '%s' "${stat}" | grep -E '^[12u] M' -c)
+      num_my=$(printf '%s' "${stat}" | grep -E '^[12u] .M' -c)
+      num_dx=$(printf '%s' "${stat}" | grep -E '^[12u] D' -c)
+      num_dy=$(printf '%s' "${stat}" | grep -E '^[12u] .D' -c)
+      num_rx=$(printf '%s' "${stat}" | grep -E '^[12u] R' -c)
+      num_ry=$(printf '%s' "${stat}" | grep -E '^[12u] .R' -c)
+      num_cx=$(printf '%s' "${stat}" | grep -E '^[12u] C' -c)
+      num_cy=$(printf '%s' "${stat}" | grep -E '^[12u] .C' -c)
       num_u=$(printf '%s' "${stat}" | grep '^? ' -c)
       total=$(printf '%s' "${stat}" | grep '^[12u?] ' -c)
 
       # Construct the stats
       stats=''
 
-      if [[ -n "${ah}" && "${ah}" -gt 0 ]]; then stats+=" +${ah}"; fi
-      if [[ -n "${bh}" && "${bh}" -gt 0 ]]; then stats+=" -${bh}"; fi
-      if [[ "${num_a}" -gt 0 ]]; then stats+=" a${num_a}"; fi
-      if [[ "${num_m}" -gt 0 ]]; then stats+=" m${num_m}"; fi
-      if [[ "${num_d}" -gt 0 ]]; then stats+=" d${num_d}"; fi
-      if [[ "${num_r}" -gt 0 ]]; then stats+=" r${num_r}"; fi
-      if [[ "${num_c}" -gt 0 ]]; then stats+=" c${num_c}"; fi
-      if [[ "${num_u}" -gt 0 ]]; then stats+=" u${num_u}"; fi
+      if [[ -n "${a}" && "${a}" -gt 0 ]]; then stats+=" +${a}"; fi
+      if [[ -n "${b}" && "${b}" -gt 0 ]]; then stats+=" -${b}"; fi
+
+      stats+=$(get_xy_stats 'a' "${num_a}")
+      stats+=$(get_xy_stats 'm' "${num_mx}" "${num_my}")
+      stats+=$(get_xy_stats 'd' "${num_dx}" "${num_dy}")
+      stats+=$(get_xy_stats 'r' "${num_rx}" "${num_ry}")
+      stats+=$(get_xy_stats 'c' "${num_cx}" "${num_cy}")
+      stats+=$(get_xy_stats 'u' "${num_ux}" "${num_uy}")
 
       # Output the stats
       printf ' ' # Print the leading spacer
