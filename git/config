@@ -19,4 +19,6 @@
   rh = reset HEAD --
   ss = status -s
   s = status
+  hideUntrackedFiles = config --local status.showUntrackedFiles no
+  showUntrackedFiles = config --local status.showUntrackedFiles normal
 
