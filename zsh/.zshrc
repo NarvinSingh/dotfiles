@@ -104,7 +104,7 @@ if [[ "$?" -ne 0 ]]; then
   git_path=''
 fi
 
-get_xy_stats() {
+print_git_xy_stats() {
   code="${1}"
   num_x="${2}"
   num_y="${3}"
@@ -122,7 +122,7 @@ get_xy_stats() {
   printf '%s' "${res}"
 }
 
-get_git_status() {
+print_git_status() {
   # Git is installed
   if [[ -n "${git_path}" ]]; then
     stat=$("${git_path}" status --porcelain=v2 --branch 2> /dev/null)
@@ -157,12 +157,12 @@ get_git_status() {
       if [[ -n "${a}" && "${a}" -gt 0 ]]; then stats+=" +${a}"; fi
       if [[ -n "${b}" && "${b}" -gt 0 ]]; then stats+=" -${b}"; fi
 
-      stats+=$(get_xy_stats 'a' "${num_a}")
-      stats+=$(get_xy_stats 'm' "${num_mx}" "${num_my}")
-      stats+=$(get_xy_stats 'd' "${num_dx}" "${num_dy}")
-      stats+=$(get_xy_stats 'r' "${num_rx}" "${num_ry}")
-      stats+=$(get_xy_stats 'c' "${num_cx}" "${num_cy}")
-      stats+=$(get_xy_stats 'u' "${num_ux}" "${num_uy}")
+      stats+=$(print_git_xy_stats 'a' "${num_a}")
+      stats+=$(print_git_xy_stats 'm' "${num_mx}" "${num_my}")
+      stats+=$(print_git_xy_stats 'd' "${num_dx}" "${num_dy}")
+      stats+=$(print_git_xy_stats 'r' "${num_rx}" "${num_ry}")
+      stats+=$(print_git_xy_stats 'c' "${num_cx}" "${num_cy}")
+      stats+=$(print_git_xy_stats 'u' "${num_ux}" "${num_uy}")
 
       # Output the stats
       printf ' ' # Print the leading spacer
@@ -202,7 +202,7 @@ PS_USER="%F{$PS_CLR_USER}%n%f"
 PS_SEP="%F{$PS_CLR_AT}@%f"
 PS_HOST="%F{$PS_CLR_HOST}%m%f"
 PS_DIR="%F{$PS_CLR_DIR}%~%f"
-PS_GIT="\$(get_git_status)"
+PS_GIT="\$(print_git_status)"
 PS_SYM="%F{$PS_CLR_SYM}%#%f"
 
 # Turn on prompt substitution and assemble the prompt. Use double quotes to
