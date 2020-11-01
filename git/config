@@ -6,8 +6,9 @@
 [core]
   editor = vim
 [alias]
-  al = !~/project/linux/gitadd
-  alu = !~/project/linux/gitadd -- -u
+  al = !git add "$@" && \
+    git status -z --porcelain | grep -z '^[AMR] ' | cut -z -b 4- \
+    | xargs -0 ~/project/linux/lint -d "$(git rev-parse --show-toplevel)" && :
   b = branch
   ch = checkout
   co = commit
