@@ -334,6 +334,14 @@ augroup filetype_zsh
   autocmd Filetype zsh set foldlevel=1
 augroup END
 
+" ### dockerfile
+augroup filetype_dockerfile
+  autocmd!
+  autocmd Filetype dockerfile set foldmethod=expr
+  autocmd Filetype dockerfile set foldexpr=GetFoldLevelByHeading(v:lnum,'\#\ ')
+  autocmd Filetype dockerfile set foldlevel=1
+augroup END
+
 " Mappings
 " --------
 
