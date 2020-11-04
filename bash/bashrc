@@ -72,6 +72,7 @@ readonly CLR_FG_WHITE=$(tput setaf ${CLR_WHITE})
 readonly CLR_BG_MAROON=$(tput setab ${CLR_MAROON})
 readonly CLR_BG_GREEN=$(tput setab ${CLR_GREEN})
 readonly CLR_BG_YELLOW=$(tput setab ${CLR_YELLOW})
+readonly CLR_BG_BLUE=$(tput setab ${CLR_BLUE})
 readonly CLR_BG_WHITE=$(tput setab ${CLR_WHITE})
 readonly CLR_RESET=$(tput sgr0)
 
@@ -82,6 +83,13 @@ git_path=$(which git)
 if [[ "$?" -ne 0 ]]; then
   git_path=''
 fi
+
+print_trans_right() {
+  clr_left="${1}"
+  clr_right="${2}"
+
+  printf "$(tput setaf ${clr_left})$(tput setab ${clr_right})\ue0b0"
+}
 
 print_git_xy_stats() {
   code="${1}"
@@ -133,11 +141,11 @@ print_git_status() {
       stats=''
 
       if [[ -n "${a}" && "${a}" -gt 0 ]]; then
-        stats+=" ${CLR_FG_MAROON}+${a}"
+        stats+=" ${CLR_FG_MAROON}↑${a}"
       fi
 
       if [[ -n "${b}" && "${b}" -gt 0 ]]; then
-        stats+=" ${CLR_FG_MAROON}-${b}"
+        stats+=" ${CLR_FG_MAROON}↓${b}"
       fi
 
       stats+=$(print_git_xy_stats 'a' "${num_a}")
@@ -152,11 +160,21 @@ print_git_status() {
 
       # No changes, so the branch is clean. It may still be ahead or behind.
       if [[ "${total}" -eq 0 ]]; then
-        printf "${CLR_BG_GREEN} ${CLR_FG_WHITE}${branch} "
+        print_trans_right "${CLR_BLACK}" "${CLR_GREEN}"
+        printf " ${CLR_FG_WHITE}${branch} "
+
+        if [[ -z "${stats}" ]]; then
+          print_trans_right "${CLR_GREEN}" "${CLR_BLUE}"
+        else
+          print_trans_right "${CLR_GREEN}" "${CLR_WHITE}"
+        fi
 
       # Changes, so the branch is dirty. It may also be ahead or behind.
       else
-        printf "${CLR_BG_MAROON} ${CLR_FG_WHITE}${branch} "
+        print_trans_right "${CLR_BLACK}" "${CLR_MAROON}"
+        printf "${CLR_FG_WHITE} \ue0a0 ${branch} "
+        print_trans_right "${CLR_MAROON}" "${CLR_WHITE}"
+
       fi
 
       # A clean branch may have stats because it is ahead or behind. A dirty
@@ -164,13 +182,20 @@ print_git_status() {
       # i.e., total > 0 and stats = ''.
       if [[ -n "${stats}" ]]; then
         printf "${CLR_BG_WHITE}${stats} "
+        print_trans_right "${CLR_WHITE}" "${CLR_BLUE}"
       fi
+    else
+      printf ' '
+      print_trans_right "${CLR_BLACK}" "${CLR_BLUE}"
     fi
+  else
+    printf ' '
+    print_trans_right "${CLR_BLACK}" "${CLR_BLUE}"
   fi
 
   # If we are in a repo we have to output a trailing space, and if we are
   # not in a repo or Git is not installed, we have to output a space
-  printf "${CLR_RESET} "
+  printf "${CLR_RESET}"
 }
 
 # Prompt Parts
@@ -193,7 +218,9 @@ PS_SEP="${CLR_FG_RED}@"
 PS_HOST="${CLR_FG_LIME}\h"
 PS_DIR="${CLR_FG_BLUE}\w"
 PS_GIT='$(print_git_status)'
-PS_SYM="${CLR_BG_YELLOW} ${CLR_FG_BLACK}bash ${CLR_RESET} ${CLR_FG_GREY}\\$"
+PS_SYM="${CLR_BG_BLUE} ${CLR_FG_WHITE}bash "
+PS_SYM+="$(print_trans_right ${CLR_BLUE} ${CLR_BLACK})"
+PS_SYM+="${CLR_RESET} ${CLR_FG_GREY}\\$"
 
 PS1="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} "
 PS1+="${PS_DIR}${PS_GIT}${PS_SYM}${CLR_RESET} "
