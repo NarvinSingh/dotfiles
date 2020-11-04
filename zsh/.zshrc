@@ -104,6 +104,13 @@ if [[ "$?" -ne 0 ]]; then
   git_path=''
 fi
 
+print_trans_right() {
+  clr_left="${1}"
+  clr_right="${2}"
+
+  printf "%%F{${clr_left}}%%K{${clr_right}}\ue0b0"
+}
+
 print_git_xy_stats() {
   code="${1}"
   num_x="${2}"
@@ -176,20 +183,20 @@ print_git_status() {
 
       # No changes, so the branch is clean. It may still be ahead or behind.
       if [[ "${total}" -eq 0 ]]; then
-        printf "%%K{${PS_CLR_BG_GIT_C}}%%F{${CLR_BLACK}}\ue0b0"
+        print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_C}"
         printf "%%F{${PS_CLR_GIT_C}} \ue0a0 ${branch} "
 
         if [[ -z "${is_ab}" ]]; then
-          printf "%%K{${CLR_BLACK}}%%F{${PS_CLR_BG_GIT_C}}\ue0b0%%f%%k"
+          print_trans_right "${PS_CLR_BG_GIT_C}" "${CLR_BLACK}"
         else
-          printf "%%K{${PS_CLR_BG_GIT_S}}%%F{${PS_CLR_BG_GIT_C}}\ue0b0%%f%%k"
+          print_trans_right "${PS_CLR_BG_GIT_C}" "${PS_CLR_BG_GIT_S}"
         fi
 
       # Changes, so the branch is dirty. It may also be ahead or behind.
       else
-        printf "%%K{${PS_CLR_BG_GIT_D}}%%F{${CLR_BLACK}}\ue0b0"
+        print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_D}"
         printf "%%F{${PS_CLR_GIT_D}} \ue0a0 ${branch} "
-        printf "%%K{${PS_CLR_BG_GIT_S}}%%F{${PS_CLR_BG_GIT_D}}\ue0b0%%f%%k"
+        print_trans_right "${PS_CLR_BG_GIT_D}" "${PS_CLR_BG_GIT_S}"
       fi
 
       # A clean branch may have stats because it is ahead or behind. A dirty
@@ -197,7 +204,7 @@ print_git_status() {
       # i.e., total > 0 and stats = ''.
       if [[ -n "${stats}" ]]; then
         printf "%%K{${PS_CLR_BG_GIT_S}}%%F{${PS_CLR_GIT_S}}${stats}%%f "
-        printf "%%K{${CLR_BLACK}}%%F{${PS_CLR_BG_GIT_S}}\ue0b0%%f%%k"
+        print_trans_right "${PS_CLR_BG_GIT_S}" "${CLR_BLACK}"
       fi
     fi
   fi
