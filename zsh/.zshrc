@@ -154,8 +154,15 @@ print_git_status() {
       # Construct the stats
       stats=''
 
-      if [[ -n "${a}" && "${a}" -gt 0 ]]; then stats+=" ↑${a}"; fi
-      if [[ -n "${b}" && "${b}" -gt 0 ]]; then stats+=" ↓${b}"; fi
+      if [[ -n "${a}" && "${a}" -gt 0 ]]; then
+        stats+=" ↑${a}"
+        is_ab=1
+      fi
+
+      if [[ -n "${b}" && "${b}" -gt 0 ]]; then
+        stats+=" ↓${b}"
+        is_ab=1
+      fi
 
       stats+=$(print_git_xy_stats 'a' "${num_a}")
       stats+=$(print_git_xy_stats 'm' "${num_mx}" "${num_my}")
@@ -171,7 +178,12 @@ print_git_status() {
       if [[ "${total}" -eq 0 ]]; then
         printf "%%K{${PS_CLR_BG_GIT_C}}%%F{${CLR_BLACK}}\ue0b0"
         printf "%%F{${PS_CLR_GIT_C}} \ue0a0 ${branch} "
-        printf "%%K{${CLR_BLACK}}%%F{${PS_CLR_BG_GIT_C}}\ue0b0%%f%%k"
+
+        if [[ -z "${is_ab}" ]]; then
+          printf "%%K{${CLR_BLACK}}%%F{${PS_CLR_BG_GIT_C}}\ue0b0%%f%%k"
+        else
+          printf "%%K{${PS_CLR_BG_GIT_S}}%%F{${PS_CLR_BG_GIT_C}}\ue0b0%%f%%k"
+        fi
 
       # Changes, so the branch is dirty. It may also be ahead or behind.
       else
