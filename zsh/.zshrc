@@ -97,13 +97,13 @@ PS_CLR_SYM=${CLR_GREY}
 
 # Git
 # ---
-
 git_path=$(which git)
 
 if [[ "$?" -ne 0 ]]; then
   git_path=''
 fi
 
+# ### print_trans_right
 print_trans_right() {
   clr_left="${1}"
   clr_right="${2}"
@@ -111,6 +111,7 @@ print_trans_right() {
   printf "%%F{${clr_left}}%%K{${clr_right}}\ue0b0"
 }
 
+# ### print_git_xy_stats
 print_git_xy_stats() {
   code="${1}"
   num_x="${2}"
@@ -129,6 +130,7 @@ print_git_xy_stats() {
   printf '%s' "${res}"
 }
 
+# ### print_git_status
 print_git_status() {
   # Git is installed
   if [[ -n "${git_path}" ]]; then
