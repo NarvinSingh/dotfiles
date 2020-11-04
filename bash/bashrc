@@ -113,6 +113,9 @@ print_git_xy_stats() {
 
 # ### print_git_status
 print_git_status() {
+  # Print the leading spacer
+  printf ' '
+
   # Git is installed
   if [[ -n "${git_path}" ]]; then
     stat=$("${git_path}" status --porcelain=v2 --branch 2> /dev/null)
@@ -159,7 +162,6 @@ print_git_status() {
       stats+=$(print_git_xy_stats 'u' "${num_u}")
 
       # Output the stats
-      printf ' ' # Print the leading spacer
 
       # No changes, so the branch is clean. It may still be ahead or behind.
       if [[ "${total}" -eq 0 ]]; then
@@ -188,11 +190,9 @@ print_git_status() {
         print_trans_right "${CLR_WHITE}" "${CLR_BLUE}"
       fi
     else
-      printf ' '
       print_trans_right "${CLR_BLACK}" "${CLR_BLUE}"
     fi
   else
-    printf ' '
     print_trans_right "${CLR_BLACK}" "${CLR_BLUE}"
   fi
 
