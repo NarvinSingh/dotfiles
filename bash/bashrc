@@ -38,7 +38,69 @@ SAVEHIST=1000
 
 # Prompt
 # ======
-PS1='\[\033[01;32m\]\u@\h\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\] \$ '
+
+# Colors
+# ------
+
+# ## Palette
+readonly CLR_BLACK=0
+readonly CLR_MAROON=1
+readonly CLR_GREEN=2
+readonly CLR_OLIVE=3
+readonly CLR_NAVY=4
+readonly CLR_PURPLE=5
+readonly CLR_TEAL=6
+readonly CLR_SILVER=7
+readonly CLR_GREY=8
+readonly CLR_RED=9
+readonly CLR_LIME=10
+readonly CLR_YELLOW=11
+readonly CLR_BLUE=12
+readonly CLR_FUCHSIA=13
+readonly CLR_AQUA=14
+readonly CLR_WHITE=15
+
+# ## Scheme
+readonly CLR_FG_MAROON=$(tput setaf ${CLR_MAROON})
+readonly CLR_FG_GREY=$(tput setaf ${CLR_GREY})
+readonly CLR_FG_RED=$(tput setaf ${CLR_RED})
+readonly CLR_FG_LIME=$(tput setaf ${CLR_LIME})
+readonly CLR_FG_BLUE=$(tput setaf ${CLR_BLUE})
+readonly CLR_BG_MAROON=$(tput setaf ${CLR_MAROON})
+readonly CLR_BG_GREEN=$(tput setaf ${CLR_GREEN})
+readonly CLR_BG_WHITE=$(tput setaf ${CLR_WHITE})
+readonly CLR_RESET=$(tput sgr0)
+
+# Git
+# ---
+print_git_status() {
+  # TODO: implement git status
+  printf ' '
+}
+
+# Prompt Parts
+# ------------
+
+print_last_status() {
+  if [[ "$?" = '0' ]]; then
+    printf "${CLR_FG_LIME}√"
+  else
+    printf "${CLR_FG_RED}$?"
+  fi
+}
+
+# Each part will be expanded once when assembled to form the prompt. If any
+# portion of a part needs to be expanded each time the prompt is written,
+# simply don't expand, or escape the $ for those portions.
+PS_LAST='$(print_last_status)'
+PS_USER="${CLR_FG_LIME}\u"
+PS_SEP="${CLR_FG_RED}@"
+PS_HOST="${CLR_FG_LIME}\h"
+PS_DIR="${CLR_FG_BLUE}\w"
+PS_GIT='$(print_git_status)'
+PS_SYM="${CLR_FG_GREY}(bash) \\$"
+
+PS1="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} ${PS_DIR}${PS_GIT}${PS_SYM} "
 
 # Aliases
 # =======
