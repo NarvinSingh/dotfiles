@@ -62,20 +62,113 @@ readonly CLR_WHITE=15
 
 # ## Scheme
 readonly CLR_FG_MAROON=$(tput setaf ${CLR_MAROON})
+readonly CLR_FG_GREEN=$(tput setaf ${CLR_GREEN})
 readonly CLR_FG_GREY=$(tput setaf ${CLR_GREY})
 readonly CLR_FG_RED=$(tput setaf ${CLR_RED})
 readonly CLR_FG_LIME=$(tput setaf ${CLR_LIME})
 readonly CLR_FG_BLUE=$(tput setaf ${CLR_BLUE})
-readonly CLR_BG_MAROON=$(tput setaf ${CLR_MAROON})
-readonly CLR_BG_GREEN=$(tput setaf ${CLR_GREEN})
-readonly CLR_BG_WHITE=$(tput setaf ${CLR_WHITE})
+readonly CLR_FG_WHITE=$(tput setaf ${CLR_WHITE})
+readonly CLR_BG_MAROON=$(tput setab ${CLR_MAROON})
+readonly CLR_BG_GREEN=$(tput setab ${CLR_GREEN})
+readonly CLR_BG_WHITE=$(tput setab ${CLR_WHITE})
 readonly CLR_RESET=$(tput sgr0)
 
 # Git
 # ---
+git_path=$(which git)
+
+if [[ "$?" -ne 0 ]]; then
+  git_path=''
+fi
+
+print_git_xy_stats() {
+  code="${1}"
+  num_x="${2}"
+  num_y="${3}"
+  res=''
+
+  if [[ "${num_x}" -gt 0 || "${num_y}" -gt 0 ]]; then
+    res+=" ${CLR_FG_MAROON}${code}"
+
+    if [[ "${num_x}" -gt 0 ]]; then res+="${CLR_FG_GREEN}${num_x}"; fi
+    if [[ "${num_y}" -gt 0 ]]; then
+      res+="${CLR_FG_MAROON}:${CLR_FG_MAROON}${num_y}"
+    fi
+  fi
+
+  printf "${res}"
+}
+
 print_git_status() {
-  # TODO: implement git status
-  printf ' '
+  # Git is installed
+  if [[ -n "${git_path}" ]]; then
+    stat=$("${git_path}" status --porcelain=v2 --branch 2> /dev/null)
+
+    # Inside a repo so generate and output the status
+    if [[ "$?" -eq 0 ]]; then
+      # Parse the branch and fallback to a default value
+      branch=$(printf "${stat}" | grep '^# branch.head ' -m 1 | cut -b 15-)
+
+      # Parse ahead and behind
+      ab=$(printf "${stat}" | grep '^# branch.ab ' -m 1)
+      a=$(printf "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
+      b=$(printf "${ab}" | cut -d '-' -f 2)
+
+      # Parse the changes
+      num_a=$(printf "${stat}" | grep '^[12u] A' -c)
+      num_mx=$(printf "${stat}" | grep -E '^[12u] M' -c)
+      num_my=$(printf "${stat}" | grep -E '^[12u] .M' -c)
+      num_dx=$(printf "${stat}" | grep -E '^[12u] D' -c)
+      num_dy=$(printf "${stat}" | grep -E '^[12u] .D' -c)
+      num_rx=$(printf "${stat}" | grep -E '^[12u] R' -c)
+      num_ry=$(printf "${stat}" | grep -E '^[12u] .R' -c)
+      num_cx=$(printf "${stat}" | grep -E '^[12u] C' -c)
+      num_cy=$(printf "${stat}" | grep -E '^[12u] .C' -c)
+      num_u=$(printf "${stat}" | grep '^? ' -c)
+      total=$(printf "${stat}" | grep '^[12u?] ' -c)
+
+      # Construct the stats
+      stats=''
+
+      if [[ -n "${a}" && "${a}" -gt 0 ]]; then
+        stats+=" ${CLR_FG_MAROON}+${a}"
+      fi
+
+      if [[ -n "${b}" && "${b}" -gt 0 ]]; then
+        stats+=" ${CLR_FG_MAROON}-${b}"
+      fi
+
+      stats+=$(print_git_xy_stats 'a' "${num_a}")
+      stats+=$(print_git_xy_stats 'm' "${num_mx}" "${num_my}")
+      stats+=$(print_git_xy_stats 'd' "${num_dx}" "${num_dy}")
+      stats+=$(print_git_xy_stats 'r' "${num_rx}" "${num_ry}")
+      stats+=$(print_git_xy_stats 'c' "${num_cx}" "${num_cy}")
+      stats+=$(print_git_xy_stats 'u' "${num_u}")
+
+      # Output the stats
+      printf ' ' # Print the leading spacer
+
+      # No changes, so the branch is clean. It may still be ahead or behind.
+      if [[ "${total}" -eq 0 ]]; then
+        printf "${CLR_BG_GREEN} ${CLR_FG_WHITE}${branch} "
+
+      # Changes, so the branch is dirty. It may also be ahead or behind.
+      else
+        printf "${CLR_BG_MAROON} ${CLR_FG_WHITE}${branch} "
+      fi
+
+      # A clean branch may have stats because it is ahead or behind. A dirty
+      # branch may not have stats if there are changes we didn't check for,
+      # i.e., total > 0 and stats = ''.
+      if [[ -n "${stats}" ]]; then
+        printf "${CLR_BG_WHITE}${stats} "
+      fi
+    fi
+  fi
+
+  # If we are in a repo we have to output a trailing space, and if we are
+  # not in a repo or Git is not installed, we have to output a space
+  printf "${CLR_RESET} "
 }
 
 # Prompt Parts
