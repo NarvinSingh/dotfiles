@@ -169,19 +169,23 @@ print_git_status() {
 
       # No changes, so the branch is clean. It may still be ahead or behind.
       if [[ "${total}" -eq 0 ]]; then
-        printf "%%K{${PS_CLR_BG_GIT_C}} %%F{${PS_CLR_GIT_C}}${branch}%%f %%k"
+        printf "%%K{${PS_CLR_BG_GIT_C}}%%F{${CLR_BLACK}}\ue0b0"
+        printf "%%F{${PS_CLR_GIT_C}} \ue0a0 ${branch} "
+        printf "%%K{${CLR_BLACK}}%%F{${PS_CLR_BG_GIT_C}}\ue0b0%%f%%k"
 
       # Changes, so the branch is dirty. It may also be ahead or behind.
       else
-        printf "%%K{${PS_CLR_BG_GIT_D}} %%F{${PS_CLR_GIT_D}}${branch}%%f %%k"
+        printf "%%K{${PS_CLR_BG_GIT_D}}%%F{${CLR_BLACK}}\ue0b0"
+        printf "%%F{${PS_CLR_GIT_D}} \ue0a0 ${branch} "
+        printf "%%K{${PS_CLR_BG_GIT_S}}%%F{${PS_CLR_BG_GIT_D}}\ue0b0%%f%%k"
       fi
 
       # A clean branch may have stats because it is ahead or behind. A dirty
       # branch may not have stats if there are changes we didn't check for,
       # i.e., total > 0 and stats = ''.
       if [[ -n "${stats}" ]]; then
-        printf "%%K{${PS_CLR_BG_GIT_S}}%%F{${PS_CLR_GIT_S}}${stats}%%f %%k"
-        #                              ^ If not empty, stats has a leading space
+        printf "%%K{${PS_CLR_BG_GIT_S}}%%F{${PS_CLR_GIT_S}}${stats}%%f "
+        printf "%%K{${CLR_BLACK}}%%F{${PS_CLR_BG_GIT_S}}\ue0b0%%f%%k"
       fi
     fi
   fi
