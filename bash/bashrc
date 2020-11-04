@@ -195,7 +195,8 @@ PS_DIR="${CLR_FG_BLUE}\w"
 PS_GIT='$(print_git_status)'
 PS_SYM="${CLR_BG_YELLOW} ${CLR_FG_BLACK}bash ${CLR_RESET} ${CLR_FG_GREY}\\$"
 
-PS1="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} ${PS_DIR}${PS_GIT}${PS_SYM} "
+PS1="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} "
+PS1+="${PS_DIR}${PS_GIT}${PS_SYM}${CLR_RESET} "
 
 # Aliases
 # =======
