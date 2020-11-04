@@ -161,15 +161,9 @@ print_git_status() {
       # Construct the stats
       stats=''
 
-      if [[ -n "${a}" && "${a}" -gt 0 ]]; then
-        stats+=" ↑${a}"
-        is_ab=1
-      fi
+      if [[ -n "${a}" && "${a}" -gt 0 ]]; then stats+=" ↑${a}"; fi
 
-      if [[ -n "${b}" && "${b}" -gt 0 ]]; then
-        stats+=" ↓${b}"
-        is_ab=1
-      fi
+      if [[ -n "${b}" && "${b}" -gt 0 ]]; then stats+=" ↓${b}"; fi
 
       stats+=$(print_git_xy_stats 'a' "${num_a}")
       stats+=$(print_git_xy_stats 'm' "${num_mx}" "${num_my}")
@@ -186,7 +180,7 @@ print_git_status() {
         print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_C}"
         printf "%%F{${PS_CLR_GIT_C}} \ue0a0 ${branch} "
 
-        if [[ -z "${is_ab}" ]]; then
+        if [[ -z "${stats}" ]]; then
           print_trans_right "${PS_CLR_BG_GIT_C}" "${CLR_BLACK}"
         else
           print_trans_right "${PS_CLR_BG_GIT_C}" "${PS_CLR_BG_GIT_S}"
