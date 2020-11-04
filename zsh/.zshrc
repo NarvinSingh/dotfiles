@@ -196,13 +196,13 @@ print_git_status() {
 
 # Each part will be expanded once when assembled to form the prompt. If any
 # portion of a part needs to be expanded each time the prompt is written,
-# simply escape the $ for those portions.
+# simply don't expand, escape the $ for those portions.
 PS_LAST="%(?.%F{$PS_CLR_LAST_OK}√.%F{$PS_CLR_LAST_ERR}%?)%f"
 PS_USER="%F{$PS_CLR_USER}%n%f"
 PS_SEP="%F{$PS_CLR_AT}@%f"
 PS_HOST="%F{$PS_CLR_HOST}%m%f"
 PS_DIR="%F{$PS_CLR_DIR}%~%f"
-PS_GIT="\$(print_git_status)"
+PS_GIT='$(print_git_status)'
 PS_SYM="%F{$PS_CLR_SYM}%#%f"
 
 # Turn on prompt substitution and assemble the prompt. Use double quotes to
