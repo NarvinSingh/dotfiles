@@ -154,8 +154,8 @@ print_git_status() {
       # Construct the stats
       stats=''
 
-      if [[ -n "${a}" && "${a}" -gt 0 ]]; then stats+=" +${a}"; fi
-      if [[ -n "${b}" && "${b}" -gt 0 ]]; then stats+=" -${b}"; fi
+      if [[ -n "${a}" && "${a}" -gt 0 ]]; then stats+=" ↑${a}"; fi
+      if [[ -n "${b}" && "${b}" -gt 0 ]]; then stats+=" ↓${b}"; fi
 
       stats+=$(print_git_xy_stats 'a' "${num_a}")
       stats+=$(print_git_xy_stats 'm' "${num_mx}" "${num_my}")
