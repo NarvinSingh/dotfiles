@@ -61,6 +61,7 @@ readonly CLR_AQUA=14
 readonly CLR_WHITE=15
 
 # ## Scheme
+readonly CLR_FG_BLACK=$(tput setaf ${CLR_BLACK})
 readonly CLR_FG_MAROON=$(tput setaf ${CLR_MAROON})
 readonly CLR_FG_GREEN=$(tput setaf ${CLR_GREEN})
 readonly CLR_FG_GREY=$(tput setaf ${CLR_GREY})
@@ -70,6 +71,7 @@ readonly CLR_FG_BLUE=$(tput setaf ${CLR_BLUE})
 readonly CLR_FG_WHITE=$(tput setaf ${CLR_WHITE})
 readonly CLR_BG_MAROON=$(tput setab ${CLR_MAROON})
 readonly CLR_BG_GREEN=$(tput setab ${CLR_GREEN})
+readonly CLR_BG_YELLOW=$(tput setab ${CLR_YELLOW})
 readonly CLR_BG_WHITE=$(tput setab ${CLR_WHITE})
 readonly CLR_RESET=$(tput sgr0)
 
@@ -191,7 +193,7 @@ PS_SEP="${CLR_FG_RED}@"
 PS_HOST="${CLR_FG_LIME}\h"
 PS_DIR="${CLR_FG_BLUE}\w"
 PS_GIT='$(print_git_status)'
-PS_SYM="${CLR_FG_GREY}(bash) \\$"
+PS_SYM="${CLR_BG_YELLOW} ${CLR_FG_BLACK}bash ${CLR_RESET} ${CLR_FG_GREY}\\$"
 
 PS1="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} ${PS_DIR}${PS_GIT}${PS_SYM} "
 
