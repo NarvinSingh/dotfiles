@@ -176,10 +176,12 @@ print_git_status() {
 
       if [[ -n "${a}" && "${a}" -gt 0 ]]; then
         stats+=" %F{${PS_CLR_GIT_S}}↑%F{${PS_CLR_GIT_S_X}}${a}%f"
+        is_ahead=1
       fi
 
       if [[ -n "${b}" && "${b}" -gt 0 ]]; then
-        stats+=" %F{${PS_CLR_GIT_S}}↓%F{${PS_CLR_GIT_S_X}}${b}%f"
+        if [[ -z "${is_ahead}" ]]; then stats+=' '; fi
+        stats+="%F{${PS_CLR_GIT_S}}↓%F{${PS_CLR_GIT_S_X}}${b}%f"
       fi
 
       stats+=$(print_git_xy_stats 'a' "${num_a}")

@@ -157,10 +157,12 @@ print_git_status() {
 
       if [[ -n "${a}" && "${a}" -gt 0 ]]; then
         stats+=" ${CLR_FG_MAROON}↑${CLR_FG_GREEN}${a}"
+        is_ahead=1
       fi
 
       if [[ -n "${b}" && "${b}" -gt 0 ]]; then
-        stats+=" ${CLR_FG_MAROON}↓${CLR_FG_GREEN}${b}"
+        if [[ -z "${is_ahead}" ]]; then printf ' '; fi
+        stats+="${CLR_FG_MAROON}↓${CLR_FG_GREEN}${b}"
       fi
 
       stats+=$(print_git_xy_stats 'a' "${num_a}")
