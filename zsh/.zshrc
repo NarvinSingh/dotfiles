@@ -57,6 +57,10 @@ SAVEHIST=1000
 # Prompt
 # ======
 
+# Powerline
+# ---------
+export POWERLINE=1
+
 # Colors
 # ------
 
