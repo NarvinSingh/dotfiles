@@ -108,7 +108,10 @@ print_trans_right() {
   clr_left="${1}"
   clr_right="${2}"
 
-  printf "%%F{${clr_left}}%%K{${clr_right}}\ue0b0"
+  # Print the rightward transition. The foreground and background color are
+  # set. The background color is not reset so it will effect the text that
+  # follows the transition.
+  printf "%%F{${clr_left}}%%K{${clr_right}}\ue0b0%%f"
 }
 
 # ### print_git_xy_stats
@@ -118,16 +121,22 @@ print_git_xy_stats() {
   num_y="${3}"
   res=''
 
+  # Print a leading space, the code and the stats that are available. The
+  # foreground color is set and reset at the end, but the background color is
+  # inherited. This allows stats to be concatenated, then tack on a trailing
+  # space to get balanced paddding, and wrap in a background color.
   if [[ "${num_x}" -gt 0 || "${num_y}" -gt 0 ]]; then
-    res+=" %%F{${PS_CLR_GIT_S}}${code}%%f"
+    res+=" %%F{${PS_CLR_GIT_S}}${code}"
 
-    if [[ "${num_x}" -gt 0 ]]; then res+="%%F{${PS_CLR_GIT_S_X}}${num_x}%%f"; fi
+    if [[ "${num_x}" -gt 0 ]]; then res+="%%F{${PS_CLR_GIT_S_X}}${num_x}"; fi
     if [[ "${num_y}" -gt 0 ]]; then
-      res+="%%F{${PS_CLR_GIT_S}}:%%f%%F{${PS_CLR_GIT_S_Y}}${num_y}%%f"
+      res+="%%F{${PS_CLR_GIT_S}}:%%F{${PS_CLR_GIT_S_Y}}${num_y}"
     fi
+
+    res+='%%f'
   fi
 
-  printf '%s' "${res}"
+  printf "${res}"
 }
 
 # ### print_git_status
@@ -144,8 +153,8 @@ print_git_status() {
 
       # Parse ahead and behind
       ab=$(printf '%s' "${stat}" | grep '^# branch.ab ' -m 1)
-      a=$(printf "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
-      b=$(printf "${ab}" | cut -d '-' -f 2)
+      a=$(printf '%s' "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
+      b=$(printf '%s' "${ab}" | cut -d '-' -f 2)
 
       # Parse the changes
       num_a=$(printf '%s' "${stat}" | grep '^[12u] A' -c)
@@ -163,9 +172,13 @@ print_git_status() {
       # Construct the stats
       stats=''
 
-      if [[ -n "${a}" && "${a}" -gt 0 ]]; then stats+=" ↑${a}"; fi
+      if [[ -n "${a}" && "${a}" -gt 0 ]]; then
+        stats+=" %F{${PS_CLR_GIT_S}}↑%F{${PS_CLR_GIT_S_X}}${a}%f"
+      fi
 
-      if [[ -n "${b}" && "${b}" -gt 0 ]]; then stats+=" ↓${b}"; fi
+      if [[ -n "${b}" && "${b}" -gt 0 ]]; then
+        stats+=" %F{${PS_CLR_GIT_S}}↓%F{${PS_CLR_GIT_S_X}}${b}%f"
+      fi
 
       stats+=$(print_git_xy_stats 'a' "${num_a}")
       stats+=$(print_git_xy_stats 'm' "${num_mx}" "${num_my}")
@@ -174,33 +187,56 @@ print_git_status() {
       stats+=$(print_git_xy_stats 'c' "${num_cx}" "${num_cy}")
       stats+=$(print_git_xy_stats 'u' "${num_u}")
 
-      # Output the stats
+      # Output the status
       printf ' ' # Print the leading spacer
 
-      # No changes, so the branch is clean. It may still be ahead or behind.
-      if [[ "${total}" -eq 0 ]]; then
-        print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_C}"
-        printf "%%F{${PS_CLR_GIT_C}} \ue0a0 ${branch} "
+      # Powerline
+      if [[ -n "${POWERLINE}" ]]; then
+        # Clean branch
+        if [[ "${total}" -eq 0 ]]; then
+          print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_C}"
+          printf "%%F{${PS_CLR_GIT_C}} \ue0a0 ${branch} "
 
-        if [[ -z "${stats}" ]]; then
-          print_trans_right "${PS_CLR_BG_GIT_C}" "${CLR_BLACK}"
+          if [[ -z "${stats}" ]]; then
+            print_trans_right "${PS_CLR_BG_GIT_C}" "${CLR_BLACK}"
+          else
+            print_trans_right "${PS_CLR_BG_GIT_C}" "${PS_CLR_BG_GIT_S}"
+          fi
+
+        # Dirty branch
         else
-          print_trans_right "${PS_CLR_BG_GIT_C}" "${PS_CLR_BG_GIT_S}"
+          print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_D}"
+          printf "%%F{${PS_CLR_GIT_D}} \ue0a0 ${branch} "
+          print_trans_right "${PS_CLR_BG_GIT_D}" "${PS_CLR_BG_GIT_S}"
         fi
 
-      # Changes, so the branch is dirty. It may also be ahead or behind.
-      else
-        print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_D}"
-        printf "%%F{${PS_CLR_GIT_D}} \ue0a0 ${branch} "
-        print_trans_right "${PS_CLR_BG_GIT_D}" "${PS_CLR_BG_GIT_S}"
-      fi
+        # A clean branch will have stats if is ahead or behind. A dirty branch
+        # may not have stats if there are changes we didn't check for, i.e.,
+        # total > 0 and stats = ''.
+        if [[ -n "${stats}" ]]; then
+          # ${stats} contains '%' characters, so feed it into printf so they
+          # are treated literally
+          printf "%%K{${PS_CLR_BG_GIT_S}}%s " "${stats}"
+          print_trans_right "${PS_CLR_BG_GIT_S}" "${CLR_BLACK}"
+        fi
 
-      # A clean branch may have stats because it is ahead or behind. A dirty
-      # branch may not have stats if there are changes we didn't check for,
-      # i.e., total > 0 and stats = ''.
-      if [[ -n "${stats}" ]]; then
-        printf "%%K{${PS_CLR_BG_GIT_S}}%%F{${PS_CLR_GIT_S}}${stats}%%f "
-        print_trans_right "${PS_CLR_BG_GIT_S}" "${CLR_BLACK}"
+      # No Powerline
+      else
+        # Clean branch
+        if [[ "${total}" -eq 0 ]]; then
+          printf "%%K{${PS_CLR_BG_GIT_C}} %%F{${PS_CLR_GIT_C}}${branch} %%f%%k"
+
+        # Dirty branch
+        else
+          printf "%%K{${PS_CLR_BG_GIT_D}} %%F{${PS_CLR_GIT_D}}${branch} %%f%%k"
+        fi
+
+        # Stats
+        if [[ -n "${stats}" ]]; then
+          # ${stats} contains '%' characters, so feed it into printf so they
+          # are treated literally
+          printf "%%K{${PS_CLR_BG_GIT_S}}%s %%k" "${stats}"
+        fi
       fi
     fi
   fi
@@ -213,11 +249,19 @@ print_git_status() {
 # Prompt Parts
 # ------------
 
+# ### print_ps_ok
+print_ps_ok() {
+  if [[ -n "${POWERLINE}" ]]; then
+    printf '\u2713'
+  else
+    printf '√'
+  fi
+}
+
 # Each part will be expanded once when assembled to form the prompt. If any
 # portion of a part needs to be expanded each time the prompt is written,
 # simply don't expand, escape the $ for those portions.
-PS_OK=$'\u2713'
-PS_LAST="%(?.%F{$PS_CLR_LAST_OK}${PS_OK}.%F{$PS_CLR_LAST_ERR}%?)%f"
+PS_LAST="%(?.%F{$PS_CLR_LAST_OK}\$(print_ps_ok).%F{$PS_CLR_LAST_ERR}%?)%f"
 PS_USER="%F{$PS_CLR_USER}%n%f"
 PS_SEP="%F{$PS_CLR_AT}@%f"
 PS_HOST="%F{$PS_CLR_HOST}%m%f"
