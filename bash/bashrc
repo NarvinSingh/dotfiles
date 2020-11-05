@@ -78,6 +78,8 @@ readonly CLR_RESET=$(tput sgr0)
 
 # Git
 # ---
+
+# ### Init
 git_path=$(which git)
 
 if [[ "$?" -ne 0 ]]; then
@@ -89,6 +91,9 @@ print_trans_right() {
   clr_left="${1}"
   clr_right="${2}"
 
+  # Print the rightward transition. The foreground and background color are
+  # set. The colors are not reset so they will effect the text that follows
+  # the transition.
   printf "$(tput setaf ${clr_left})$(tput setab ${clr_right})\ue0b0"
 }
 
@@ -99,6 +104,10 @@ print_git_xy_stats() {
   num_y="${3}"
   res=''
 
+  # Print a leading space, the code and the stats that are available. The
+  # foreground color is set and reset at the end, but the background color is
+  # inherited. This allows stats to be concatenated, then tack on a trailing
+  # space to get balanced paddding, and wrap in a background color.
   if [[ "${num_x}" -gt 0 || "${num_y}" -gt 0 ]]; then
     res+=" ${CLR_FG_MAROON}${code}"
 
@@ -123,35 +132,35 @@ print_git_status() {
     # Inside a repo so generate and output the status
     if [[ "$?" -eq 0 ]]; then
       # Parse the branch and fallback to a default value
-      branch=$(printf "${stat}" | grep '^# branch.head ' -m 1 | cut -b 15-)
+      branch=$(printf '%s' "${stat}" | grep '^# branch.head ' -m 1 | cut -b 15-)
 
       # Parse ahead and behind
-      ab=$(printf "${stat}" | grep '^# branch.ab ' -m 1)
-      a=$(printf "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
-      b=$(printf "${ab}" | cut -d '-' -f 2)
+      ab=$(printf '%s' "${stat}" | grep '^# branch.ab ' -m 1)
+      a=$(printf '%s' "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
+      b=$(printf '%s' "${ab}" | cut -d '-' -f 2)
 
       # Parse the changes
-      num_a=$(printf "${stat}" | grep '^[12u] A' -c)
-      num_mx=$(printf "${stat}" | grep -E '^[12u] M' -c)
-      num_my=$(printf "${stat}" | grep -E '^[12u] .M' -c)
-      num_dx=$(printf "${stat}" | grep -E '^[12u] D' -c)
-      num_dy=$(printf "${stat}" | grep -E '^[12u] .D' -c)
-      num_rx=$(printf "${stat}" | grep -E '^[12u] R' -c)
-      num_ry=$(printf "${stat}" | grep -E '^[12u] .R' -c)
-      num_cx=$(printf "${stat}" | grep -E '^[12u] C' -c)
-      num_cy=$(printf "${stat}" | grep -E '^[12u] .C' -c)
-      num_u=$(printf "${stat}" | grep '^? ' -c)
-      total=$(printf "${stat}" | grep '^[12u?] ' -c)
+      num_a=$(printf '%s' "${stat}" | grep '^[12u] A' -c)
+      num_mx=$(printf '%s' "${stat}" | grep -E '^[12u] M' -c)
+      num_my=$(printf '%s' "${stat}" | grep -E '^[12u] .M' -c)
+      num_dx=$(printf '%s' "${stat}" | grep -E '^[12u] D' -c)
+      num_dy=$(printf '%s' "${stat}" | grep -E '^[12u] .D' -c)
+      num_rx=$(printf '%s' "${stat}" | grep -E '^[12u] R' -c)
+      num_ry=$(printf '%s' "${stat}" | grep -E '^[12u] .R' -c)
+      num_cx=$(printf '%s' "${stat}" | grep -E '^[12u] C' -c)
+      num_cy=$(printf '%s' "${stat}" | grep -E '^[12u] .C' -c)
+      num_u=$(printf '%s' "${stat}" | grep '^? ' -c)
+      total=$(printf '%s' "${stat}" | grep '^[12u?] ' -c)
 
       # Construct the stats
       stats=''
 
       if [[ -n "${a}" && "${a}" -gt 0 ]]; then
-        stats+=" ${CLR_FG_MAROON}↑${a}"
+        stats+=" ${CLR_FG_MAROON}↑${CLR_FG_GREEN}${a}"
       fi
 
       if [[ -n "${b}" && "${b}" -gt 0 ]]; then
-        stats+=" ${CLR_FG_MAROON}↓${b}"
+        stats+=" ${CLR_FG_MAROON}↓${CLR_FG_GREEN}${b}"
       fi
 
       stats+=$(print_git_xy_stats 'a' "${num_a}")
@@ -161,39 +170,54 @@ print_git_status() {
       stats+=$(print_git_xy_stats 'c' "${num_cx}" "${num_cy}")
       stats+=$(print_git_xy_stats 'u' "${num_u}")
 
-      # Output the stats
+      # Output the status
 
-      # No changes, so the branch is clean. It may still be ahead or behind.
-      if [[ "${total}" -eq 0 ]]; then
-        print_trans_right "${CLR_BLACK}" "${CLR_GREEN}"
-        printf " ${CLR_FG_WHITE}${branch} "
+      # Powerline
+      if [[ -n "${POWERLINE}" ]]; then
+        # Clean branch
+        if [[ "${total}" -eq 0 ]]; then
+          print_trans_right "${CLR_BLACK}" "${CLR_GREEN}"
+          printf " ${CLR_FG_WHITE}${branch} "
 
-        if [[ -z "${stats}" ]]; then
-          print_trans_right "${CLR_GREEN}" "${CLR_BLUE}"
+          if [[ -z "${stats}" ]]; then
+            print_trans_right "${CLR_GREEN}" "${CLR_BLUE}"
+          else
+            print_trans_right "${CLR_GREEN}" "${CLR_WHITE}"
+          fi
+
+        # Dirty branch
         else
-          print_trans_right "${CLR_GREEN}" "${CLR_WHITE}"
+          print_trans_right "${CLR_BLACK}" "${CLR_MAROON}"
+          printf "${CLR_FG_WHITE} \ue0a0 ${branch} "
+          print_trans_right "${CLR_MAROON}" "${CLR_WHITE}"
+
         fi
 
-      # Changes, so the branch is dirty. It may also be ahead or behind.
+        # A clean branch may have stats because it is ahead or behind. A dirty
+        # branch may not have stats if there are changes we didn't check for,
+        # i.e., total > 0 and stats = ''.
+        if [[ -n "${stats}" ]]; then
+          printf "${CLR_BG_WHITE}${stats} "
+          print_trans_right "${CLR_WHITE}" "${CLR_BLUE}"
+        fi
+
+      # No Powerline
       else
-        print_trans_right "${CLR_BLACK}" "${CLR_MAROON}"
-        printf "${CLR_FG_WHITE} \ue0a0 ${branch} "
-        print_trans_right "${CLR_MAROON}" "${CLR_WHITE}"
+        # Clean branch
+        if [[ "${total}" -eq 0 ]]; then
+          printf "${CLR_BG_GREEN} ${CLR_FG_WHITE}${branch} "
 
-      fi
+        # Dirty branch
+        else
+          printf "${CLR_BG_MAROON} ${CLR_FG_WHITE}${branch} "
+        fi
 
-      # A clean branch may have stats because it is ahead or behind. A dirty
-      # branch may not have stats if there are changes we didn't check for,
-      # i.e., total > 0 and stats = ''.
-      if [[ -n "${stats}" ]]; then
-        printf "${CLR_BG_WHITE}${stats} "
-        print_trans_right "${CLR_WHITE}" "${CLR_BLUE}"
+        # Stats
+        if [[ -n "${stats}" ]]; then
+          printf "${CLR_BG_WHITE}${stats} "
+        fi
       fi
-    else
-      print_trans_right "${CLR_BLACK}" "${CLR_BLUE}"
     fi
-  else
-    print_trans_right "${CLR_BLACK}" "${CLR_BLUE}"
   fi
 
   # If we are in a repo we have to output a trailing space, and if we are
@@ -204,13 +228,29 @@ print_git_status() {
 # Prompt Parts
 # ------------
 
+# ### print_last_status
 print_last_status() {
   if [[ "$?" = '0' ]]; then
-    printf "${CLR_FG_LIME}\u2713"
+    if [[ -n "${POWERLINE}" ]]; then
+      printf "${CLR_FG_LIME}\u2713"
+    else
+      printf "${CLR_FG_LIME}√"
+    fi
   else
     printf "${CLR_FG_RED}$?"
   fi
 }
+
+# ### print_symbol
+print_symbol() {
+  if [[ -n "${POWERLINE}" ]]; then
+    printf "$(print_trans_right ${CLR_BLUE} ${CLR_BLACK})"
+  fi
+
+  printf "${CLR_RESET} ${CLR_FG_GREY}\$"
+}
+
+# ### Variables
 
 # Each part will be expanded once when assembled to form the prompt. If any
 # portion of a part needs to be expanded each time the prompt is written,
@@ -221,9 +261,7 @@ PS_SEP="${CLR_FG_RED}@"
 PS_HOST="${CLR_FG_LIME}\h"
 PS_DIR="${CLR_FG_BLUE}\w"
 PS_GIT='$(print_git_status)'
-PS_SYM="${CLR_BG_BLUE} ${CLR_FG_WHITE}bash "
-PS_SYM+="$(print_trans_right ${CLR_BLUE} ${CLR_BLACK})"
-PS_SYM+="${CLR_RESET} ${CLR_FG_GREY}\\$"
+PS_SYM="${CLR_BG_BLUE} ${CLR_FG_WHITE}bash \$(print_symbol)"
 
 PS1="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} "
 PS1+="${PS_DIR}${PS_GIT}${PS_SYM}${CLR_RESET} "
