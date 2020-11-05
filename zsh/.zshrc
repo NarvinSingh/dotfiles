@@ -216,7 +216,8 @@ print_git_status() {
 # Each part will be expanded once when assembled to form the prompt. If any
 # portion of a part needs to be expanded each time the prompt is written,
 # simply don't expand, escape the $ for those portions.
-PS_LAST="%(?.%F{$PS_CLR_LAST_OK}√.%F{$PS_CLR_LAST_ERR}%?)%f"
+PS_OK=$'\u2713'
+PS_LAST="%(?.%F{$PS_CLR_LAST_OK}${PS_OK}.%F{$PS_CLR_LAST_ERR}%?)%f"
 PS_USER="%F{$PS_CLR_USER}%n%f"
 PS_SEP="%F{$PS_CLR_AT}@%f"
 PS_HOST="%F{$PS_CLR_HOST}%m%f"

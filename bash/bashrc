@@ -206,7 +206,7 @@ print_git_status() {
 
 print_last_status() {
   if [[ "$?" = '0' ]]; then
-    printf "${CLR_FG_LIME}√"
+    printf "${CLR_FG_LIME}\u2713"
   else
     printf "${CLR_FG_RED}$?"
   fi
