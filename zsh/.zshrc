@@ -151,36 +151,40 @@ print_git_status() {
     if [[ "$?" -eq 0 ]]; then
       # Parse the branch and fallback to a default value
       branch=${$(printf '%s' "${stat}" \
-        | grep '^# branch.head ' -m 1 | cut -b 15-):-???}
+        | grep -m 1 '^# branch.head ' | cut -b 15-):-???}
 
       # Parse ahead and behind
-      ab=$(printf '%s' "${stat}" | grep '^# branch.ab ' -m 1)
+      ab=$(printf '%s' "${stat}" | grep -m 1 '^# branch.ab ')
       a=$(printf '%s' "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
       b=$(printf '%s' "${ab}" | cut -d '-' -f 2)
 
       # Parse the changes
-      num_a=$(printf '%s' "${stat}" | grep '^[12u] A' -c)
-      num_mx=$(printf '%s' "${stat}" | grep -E '^[12u] M' -c)
-      num_my=$(printf '%s' "${stat}" | grep -E '^[12u] .M' -c)
-      num_dx=$(printf '%s' "${stat}" | grep -E '^[12u] D' -c)
-      num_dy=$(printf '%s' "${stat}" | grep -E '^[12u] .D' -c)
-      num_rx=$(printf '%s' "${stat}" | grep -E '^[12u] R' -c)
-      num_ry=$(printf '%s' "${stat}" | grep -E '^[12u] .R' -c)
-      num_cx=$(printf '%s' "${stat}" | grep -E '^[12u] C' -c)
-      num_cy=$(printf '%s' "${stat}" | grep -E '^[12u] .C' -c)
-      num_u=$(printf '%s' "${stat}" | grep '^? ' -c)
-      total=$(printf '%s' "${stat}" | grep '^[12u?] ' -c)
+      num_a=$(printf '%s' "${stat}" | grep -c '^[12] A')
+      num_mx=$(printf '%s' "${stat}" | grep -c '^[12] M')
+      num_my=$(printf '%s' "${stat}" | grep -c '^[12] .M')
+      num_dx=$(printf '%s' "${stat}" | grep -c '^[12] D')
+      num_dy=$(printf '%s' "${stat}" | grep -c '^[12] .D')
+      num_rx=$(printf '%s' "${stat}" | grep -c '^[12] R')
+      num_ry=$(printf '%s' "${stat}" | grep -c '^[12] .R')
+      num_cx=$(printf '%s' "${stat}" | grep -c '^[12] C')
+      num_cy=$(printf '%s' "${stat}" | grep -c '^[12] .C')
+      num_um=$(printf '%s' "${stat}" | grep -c '^u UU')
+      num_uax=$(printf '%s' "${stat}" | grep -c '^u A')
+      num_uay=$(printf '%s' "${stat}" | grep -c '^u .A')
+      num_udx=$(printf '%s' "${stat}" | grep -c '^u D')
+      num_udy=$(printf '%s' "${stat}" | grep -c '^u .D')
+      num_u=$(printf '%s' "${stat}" | grep -c '^? ')
+      total=$(printf '%s' "${stat}" | grep -c '^[12u?] ')
 
       # Construct the stats
       stats=''
 
       if [[ -n "${a}" && "${a}" -gt 0 ]]; then
         stats+=" %F{${PS_CLR_GIT_S}}↑%F{${PS_CLR_GIT_S_X}}${a}%f"
-        is_ahead=1
       fi
 
       if [[ -n "${b}" && "${b}" -gt 0 ]]; then
-        if [[ -z "${is_ahead}" ]]; then stats+=' '; fi
+        if [[ -z "${stats}" ]]; then stats+=' '; fi
         stats+="%F{${PS_CLR_GIT_S}}↓%F{${PS_CLR_GIT_S_X}}${b}%f"
       fi
 
@@ -189,7 +193,10 @@ print_git_status() {
       stats+=$(print_git_xy_stats 'd' "${num_dx}" "${num_dy}")
       stats+=$(print_git_xy_stats 'r' "${num_rx}" "${num_ry}")
       stats+=$(print_git_xy_stats 'c' "${num_cx}" "${num_cy}")
-      stats+=$(print_git_xy_stats 'u' "${num_u}")
+      stats+=$(print_git_xy_stats 'um' "${num_um}")
+      stats+=$(print_git_xy_stats 'ua' "${num_uax}" "${num_uay}")
+      stats+=$(print_git_xy_stats 'ud' "${num_udx}" "${num_udy}")
+      stats+=$(print_git_xy_stats '?' "${num_u}")
 
       # Output the status
       printf ' ' # Print the leading spacer
