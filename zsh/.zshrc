@@ -97,6 +97,8 @@ PS_CLR_SYM=${CLR_GREY}
 
 # Git
 # ---
+
+# ### Init
 git_path=$(which git)
 
 if [[ "$?" -ne 0 ]]; then
@@ -257,6 +259,8 @@ print_ps_ok() {
     printf '√'
   fi
 }
+
+# ### Variables
 
 # Each part will be expanded once when assembled to form the prompt. If any
 # portion of a part needs to be expanded each time the prompt is written,
