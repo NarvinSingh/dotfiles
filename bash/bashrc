@@ -257,7 +257,16 @@ print_last_status() {
 # ### print_symbol
 print_symbol() {
   if [[ -n "${POWERLINE}" ]]; then
-    printf "$(print_trans_right ${CLR_BLUE} ${CLR_BLACK})"
+
+    # If not in a git repo we have to print the transition into the symbol
+    if ! "${git_path}" status &>/dev/null; then
+      print_trans_right ${CLR_BLACK} ${CLR_BLUE}
+    fi
+
+    printf "${CLR_BG_BLUE}${CLR_FG_WHITE} bash "
+    print_trans_right ${CLR_BLUE} ${CLR_BLACK}
+  else
+    printf "${CLR_BG_BLUE} ${CLR_FG_WHITE}bash "
   fi
 
   printf "${CLR_RESET} ${CLR_FG_GREY}\$"
@@ -274,7 +283,7 @@ PS_SEP="${CLR_FG_RED}@"
 PS_HOST="${CLR_FG_LIME}\h"
 PS_DIR="${CLR_FG_BLUE}\w"
 PS_GIT='$(print_git_status)'
-PS_SYM="${CLR_BG_BLUE} ${CLR_FG_WHITE}bash \$(print_symbol)"
+PS_SYM='$(print_symbol)'
 
 PS1="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} "
 PS1+="${PS_DIR}${PS_GIT}${PS_SYM}${CLR_RESET} "
