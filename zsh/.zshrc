@@ -274,6 +274,7 @@ print_ps_ok() {
 # Each part will be expanded once when assembled to form the prompt. If any
 # portion of a part needs to be expanded each time the prompt is written,
 # simply don't expand, escape the $ for those portions.
+CR=$'\n'
 PS_LAST="%(?.%F{$PS_CLR_LAST_OK}\$(print_ps_ok).%F{$PS_CLR_LAST_ERR}%?)%f"
 PS_USER="%F{$PS_CLR_USER}%n%f"
 PS_SEP="%F{$PS_CLR_AT}@%f"
@@ -286,7 +287,9 @@ PS_SYM="%F{$PS_CLR_SYM}%#%f"
 # expand the prompt parts right away. Dynamic portions have the $ escaped, so
 # they will be expanded each time the prompt is written.
 setopt prompt_subst
-PS1="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} ${PS_DIR}${PS_GIT}${PS_SYM} "
+PS1="${CR}"
+PS1+="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} ${PS_DIR}${PS_GIT}${CR}"
+PS1+="${PS_SYM} "
 
 # Aliases
 # =======

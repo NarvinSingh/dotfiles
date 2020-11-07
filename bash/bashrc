@@ -193,7 +193,7 @@ print_git_status() {
           printf " ${CLR_FG_WHITE} \ue0a0 ${branch} "
 
           if [[ -z "${stats}" ]]; then
-            print_trans_right "${CLR_GREEN}" "${CLR_BLUE}"
+            print_trans_right "${CLR_GREEN}" "${CLR_BLACK}"
           else
             print_trans_right "${CLR_GREEN}" "${CLR_WHITE}"
           fi
@@ -211,7 +211,7 @@ print_git_status() {
         # i.e., total > 0 and stats = ''.
         if [[ -n "${stats}" ]]; then
           printf "${CLR_BG_WHITE}${stats} "
-          print_trans_right "${CLR_WHITE}" "${CLR_BLUE}"
+          print_trans_right "${CLR_WHITE}" "${CLR_BLACK}"
         fi
 
       # No Powerline
@@ -257,12 +257,7 @@ print_last_status() {
 # ### print_symbol
 print_symbol() {
   if [[ -n "${POWERLINE}" ]]; then
-
-    # If not in a git repo we have to print the transition into the symbol
-    if ! "${git_path}" status &>/dev/null; then
-      print_trans_right ${CLR_BLACK} ${CLR_BLUE}
-    fi
-
+    print_trans_right ${CLR_BLACK} ${CLR_BLUE}
     printf "${CLR_BG_BLUE}${CLR_FG_WHITE} bash "
     print_trans_right ${CLR_BLUE} ${CLR_BLACK}
   else
@@ -277,6 +272,7 @@ print_symbol() {
 # Each part will be expanded once when assembled to form the prompt. If any
 # portion of a part needs to be expanded each time the prompt is written,
 # simply don't expand, or escape the $ for those portions.
+CR=$'\n'
 PS_LAST='$(print_last_status)'
 PS_USER="${CLR_FG_LIME}\u"
 PS_SEP="${CLR_FG_RED}@"
@@ -285,8 +281,9 @@ PS_DIR="${CLR_FG_BLUE}\w"
 PS_GIT='$(print_git_status)'
 PS_SYM='$(print_symbol)'
 
-PS1="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} "
-PS1+="${PS_DIR}${PS_GIT}${PS_SYM}${CLR_RESET} "
+PS1="${CR}"
+PS1+="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} ${PS_DIR}${PS_GIT}${CR}"
+PS1+="${PS_SYM}${CLR_RESET} "
 
 # Aliases
 # =======
