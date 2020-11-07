@@ -312,7 +312,7 @@ function! GetFoldLevelByHeading(lnum, ...)
 endfunction
 
 " ### markdown
-augroup filetype_markdown
+augroup fold_markdown
   autocmd!
   autocmd Filetype markdown set foldmethod=expr
   autocmd Filetype markdown set foldexpr=GetFoldLevelByHeading(v:lnum,'',1)
@@ -320,7 +320,7 @@ augroup filetype_markdown
 augroup END
 
 " ### vim
-augroup filetype_vim
+augroup fold_vim
   autocmd!
   autocmd Filetype vim set foldmethod=expr
   autocmd Filetype vim set foldexpr=GetFoldLevelByHeading(v:lnum,'\"\ ')
@@ -328,7 +328,7 @@ augroup filetype_vim
 augroup END
 
 " ### sh
-augroup filetype_sh
+augroup fold_sh
   autocmd!
   autocmd Filetype sh set foldmethod=expr
   autocmd Filetype sh set foldexpr=GetFoldLevelByHeading(v:lnum,'\#\ ')
@@ -336,7 +336,7 @@ augroup filetype_sh
 augroup END
 
 " ### zsh
-augroup filetype_zsh
+augroup fold_zsh
   autocmd!
   autocmd Filetype zsh set foldmethod=expr
   autocmd Filetype zsh set foldexpr=GetFoldLevelByHeading(v:lnum,'\#\ ')
@@ -344,7 +344,7 @@ augroup filetype_zsh
 augroup END
 
 " ### dockerfile
-augroup filetype_dockerfile
+augroup fold_dockerfile
   autocmd!
   autocmd Filetype dockerfile set foldmethod=expr
   autocmd Filetype dockerfile set foldexpr=GetFoldLevelByHeading(v:lnum,'\#\ ')
