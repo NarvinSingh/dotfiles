@@ -207,13 +207,22 @@ set cursorline colorcolumn=81
 
 " See https://vim.fandom.com/wiki/Indenting_source_code
 
-" ### Use 2 spaces
+" ### Default
+
+" Use 2 spaces
 set expandtab
 set shiftwidth=2
 set softtabstop=2
 
-" ### Auto indent
+" Auto indent
 set autoindent
+
+" ### markdown
+augroup indent_markdown
+  autocmd!
+  autocmd Filetype markdown set shiftwidth=4
+  autocmd Filetype markdown set softtabstop=4
+augroup END
 
 " Folds
 " -----
