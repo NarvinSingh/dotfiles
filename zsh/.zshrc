@@ -117,7 +117,7 @@ print_trans_right() {
   # Print the rightward transition. The foreground and background color are
   # set. The background color is not reset so it will effect the text that
   # follows the transition.
-  printf "%%F{${clr_left}}%%K{${clr_right}}\ue0b0%%f"
+  print -n "%F{${clr_left}}%K{${clr_right}}\ue0b0%f"
 }
 
 # ### print_git_xy_stats
@@ -132,17 +132,17 @@ print_git_xy_stats() {
   # inherited. This allows stats to be concatenated, then tack on a trailing
   # space to get balanced paddding, and wrap in a background color.
   if [[ "${num_x}" -gt 0 || "${num_y}" -gt 0 ]]; then
-    res+=" %%F{${PS_CLR_GIT_S}}${code}"
+    res+=" %F{${PS_CLR_GIT_S}}${code}"
 
-    if [[ "${num_x}" -gt 0 ]]; then res+="%%F{${PS_CLR_GIT_S_X}}${num_x}"; fi
+    if [[ "${num_x}" -gt 0 ]]; then res+="%F{${PS_CLR_GIT_S_X}}${num_x}"; fi
     if [[ "${num_y}" -gt 0 ]]; then
-      res+="%%F{${PS_CLR_GIT_S}}:%%F{${PS_CLR_GIT_S_Y}}${num_y}"
+      res+="%F{${PS_CLR_GIT_S}}:%F{${PS_CLR_GIT_S_Y}}${num_y}"
     fi
 
-    res+='%%f'
+    res+='%f'
   fi
 
-  printf "${res}"
+  print -n "${res}"
 }
 
 # ### print_git_status
@@ -154,31 +154,31 @@ print_git_status() {
     # Inside a repo so generate and output the status
     if [[ "$?" -eq 0 ]]; then
       # Parse the branch and fallback to a default value
-      branch=${$(printf '%s' "${stat}" \
+      branch=${$(print -r "${stat}" \
         | grep -m 1 '^# branch.head ' | cut -b 15-):-???}
 
       # Parse ahead and behind
-      ab=$(printf '%s' "${stat}" | grep -m 1 '^# branch.ab ')
-      a=$(printf '%s' "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
-      b=$(printf '%s' "${ab}" | cut -d '-' -f 2)
+      ab=$(print -r "${stat}" | grep -m 1 '^# branch.ab ')
+      a=$(print -r "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
+      b=$(print -r "${ab}" | cut -d '-' -f 2)
 
       # Parse the changes
-      num_a=$(printf '%s' "${stat}" | grep -c '^[12] A')
-      num_mx=$(printf '%s' "${stat}" | grep -c '^[12] M')
-      num_my=$(printf '%s' "${stat}" | grep -c '^[12] .M')
-      num_dx=$(printf '%s' "${stat}" | grep -c '^[12] D')
-      num_dy=$(printf '%s' "${stat}" | grep -c '^[12] .D')
-      num_rx=$(printf '%s' "${stat}" | grep -c '^[12] R')
-      num_ry=$(printf '%s' "${stat}" | grep -c '^[12] .R')
-      num_cx=$(printf '%s' "${stat}" | grep -c '^[12] C')
-      num_cy=$(printf '%s' "${stat}" | grep -c '^[12] .C')
-      num_um=$(printf '%s' "${stat}" | grep -c '^u UU')
-      num_uax=$(printf '%s' "${stat}" | grep -c '^u A')
-      num_uay=$(printf '%s' "${stat}" | grep -c '^u .A')
-      num_udx=$(printf '%s' "${stat}" | grep -c '^u D')
-      num_udy=$(printf '%s' "${stat}" | grep -c '^u .D')
-      num_u=$(printf '%s' "${stat}" | grep -c '^? ')
-      total=$(printf '%s' "${stat}" | grep -c '^[12u?] ')
+      num_a=$(print -r "${stat}" | grep -c '^[12] A')
+      num_mx=$(print -r "${stat}" | grep -c '^[12] M')
+      num_my=$(print -r "${stat}" | grep -c '^[12] .M')
+      num_dx=$(print -r "${stat}" | grep -c '^[12] D')
+      num_dy=$(print -r "${stat}" | grep -c '^[12] .D')
+      num_rx=$(print -r "${stat}" | grep -c '^[12] R')
+      num_ry=$(print -r "${stat}" | grep -c '^[12] .R')
+      num_cx=$(print -r "${stat}" | grep -c '^[12] C')
+      num_cy=$(print -r "${stat}" | grep -c '^[12] .C')
+      num_um=$(print -r "${stat}" | grep -c '^u UU')
+      num_uax=$(print -r "${stat}" | grep -c '^u A')
+      num_uay=$(print -r "${stat}" | grep -c '^u .A')
+      num_udx=$(print -r "${stat}" | grep -c '^u D')
+      num_udy=$(print -r "${stat}" | grep -c '^u .D')
+      num_u=$(print -r "${stat}" | grep -c '^? ')
+      total=$(print -r "${stat}" | grep -c '^[12u?] ')
 
       # Construct the stats
       stats=''
@@ -203,14 +203,14 @@ print_git_status() {
       stats+=$(print_git_xy_stats '?' "${num_u}")
 
       # Output the status
-      printf ' ' # Print the leading spacer
+      print -n ' ' # Print the leading spacer
 
       # Powerline
       if [[ -n "${POWERLINE}" ]]; then
         # Clean branch
         if [[ "${total}" -eq 0 ]]; then
           print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_C}"
-          printf "%%F{${PS_CLR_GIT_C}} \ue0a0 ${branch} "
+          print -n "%F{${PS_CLR_GIT_C}} \ue0a0 ${branch} "
 
           if [[ -z "${stats}" ]]; then
             print_trans_right "${PS_CLR_BG_GIT_C}" "${CLR_BLACK}"
@@ -221,7 +221,7 @@ print_git_status() {
         # Dirty branch
         else
           print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_D}"
-          printf "%%F{${PS_CLR_GIT_D}} \ue0a0 ${branch} "
+          print -n "%F{${PS_CLR_GIT_D}} \ue0a0 ${branch} "
           print_trans_right "${PS_CLR_BG_GIT_D}" "${PS_CLR_BG_GIT_S}"
         fi
 
@@ -229,9 +229,7 @@ print_git_status() {
         # may not have stats if there are changes we didn't check for, i.e.,
         # total > 0 and stats = ''.
         if [[ -n "${stats}" ]]; then
-          # ${stats} contains '%' characters, so feed it into printf so they
-          # are treated literally
-          printf "%%K{${PS_CLR_BG_GIT_S}}%s " "${stats}"
+          print -n "%K{${PS_CLR_BG_GIT_S}}${stats} "
           print_trans_right "${PS_CLR_BG_GIT_S}" "${CLR_BLACK}"
         fi
 
@@ -239,18 +237,16 @@ print_git_status() {
       else
         # Clean branch
         if [[ "${total}" -eq 0 ]]; then
-          printf "%%K{${PS_CLR_BG_GIT_C}} %%F{${PS_CLR_GIT_C}}${branch} %%f%%k"
+          print -n "%K{${PS_CLR_BG_GIT_C}} %F{${PS_CLR_GIT_C}}${branch} %f%k"
 
         # Dirty branch
         else
-          printf "%%K{${PS_CLR_BG_GIT_D}} %%F{${PS_CLR_GIT_D}}${branch} %%f%%k"
+          print -n "%K{${PS_CLR_BG_GIT_D}} %F{${PS_CLR_GIT_D}}${branch} %f%k"
         fi
 
         # Stats
         if [[ -n "${stats}" ]]; then
-          # ${stats} contains '%' characters, so feed it into printf so they
-          # are treated literally
-          printf "%%K{${PS_CLR_BG_GIT_S}}%s %%k" "${stats}"
+          print -n "%K{${PS_CLR_BG_GIT_S}}${stats} %k"
         fi
       fi
     fi
@@ -258,7 +254,7 @@ print_git_status() {
 
   # If we are in a repo we have to output a trailing space, and if we are
   # not in a repo or Git is not installed, we have to output a space
-  printf ' '
+  print -n ' '
 }
 
 # Prompt Parts
@@ -267,9 +263,9 @@ print_git_status() {
 # ### print_ps_ok
 print_ps_ok() {
   if [[ -n "${POWERLINE}" ]]; then
-    printf '\u2713'
+    print -n '\u2713'
   else
-    printf '√'
+    print -n '√'
   fi
 }
 
