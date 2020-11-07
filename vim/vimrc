@@ -227,7 +227,9 @@ augroup END
 " Folds
 " -----
 
-" ### GetFoldLevelByHeading
+" ### Functions
+
+" #### GetFoldLevelByHeading
 let s:last_fold_level = 0
 let s:last_last_fold_level = 0
 let s:is_code_block = 0
@@ -311,7 +313,9 @@ function! GetFoldLevelByHeading(lnum, ...)
   return s:last_fold_level
 endfunction
 
-" ### dockerfile
+" ### File types
+
+" #### dockerfile
 augroup fold_dockerfile
   autocmd!
   autocmd Filetype dockerfile set foldmethod=expr
@@ -319,7 +323,7 @@ augroup fold_dockerfile
   autocmd Filetype dockerfile set foldlevel=1
 augroup END
 
-" ### markdown
+" #### markdown
 augroup fold_markdown
   autocmd!
   autocmd Filetype markdown set foldmethod=expr
@@ -327,7 +331,7 @@ augroup fold_markdown
   autocmd Filetype markdown set foldlevel=2
 augroup END
 
-" ### sh
+" #### sh
 augroup fold_sh
   autocmd!
   autocmd Filetype sh set foldmethod=expr
@@ -335,7 +339,7 @@ augroup fold_sh
   autocmd Filetype sh set foldlevel=1
 augroup END
 
-" ### vim
+" #### vim
 augroup fold_vim
   autocmd!
   autocmd Filetype vim set foldmethod=expr
@@ -343,7 +347,7 @@ augroup fold_vim
   autocmd Filetype vim set foldlevel=1
 augroup END
 
-" ### zsh
+" #### zsh
 augroup fold_zsh
   autocmd!
   autocmd Filetype zsh set foldmethod=expr
