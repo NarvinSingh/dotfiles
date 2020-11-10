@@ -57,239 +57,348 @@ SAVEHIST=1000
 # Prompt
 # ======
 
-# Powerline
-# ---------
+# Environment
+# -----------
 export POWERLINE=1
 
-# Colors
-# ------
+# Constants
+# ---------
 
-# ## Palette
-CLR_BLACK=0
-CLR_MAROON=1
-CLR_GREEN=2
-CLR_OLIVE=3
-CLR_NAVY=4
-CLR_PURPLE=5
-CLR_TEAL=6
-CLR_SILVER=7
-CLR_GREY=8
-CLR_RED=9
-CLR_LIME=10
-CLR_YELLOW=11
-CLR_BLUE=12
-CLR_FUCHSIA=13
-CLR_AQUA=14
-CLR_WHITE=15
+# ## Colors
 
-# ## Scheme
-PS_CLR_LAST_OK=${CLR_LIME}
-PS_CLR_LAST_ERR=${CLR_RED}
-PS_CLR_USER=${CLR_LIME}
-PS_CLR_AT=${CLR_RED}
-PS_CLR_HOST=${CLR_LIME}
-PS_CLR_DIR=${CLR_BLUE}
-PS_CLR_GIT_C=${CLR_WHITE}
-PS_CLR_BG_GIT_C=${CLR_GREEN}
-PS_CLR_GIT_D=${CLR_WHITE}
-PS_CLR_BG_GIT_D=${CLR_MAROON}
-PS_CLR_GIT_S=${CLR_MAROON}
-PS_CLR_GIT_S_X=${CLR_GREEN}
-PS_CLR_GIT_S_Y=${CLR_MAROON}
-PS_CLR_BG_GIT_S=${CLR_WHITE}
-PS_CLR_SYM=${CLR_GREY}
+# ### Palette
+declare -i CLR_BLACK=0
+declare -i CLR_MAROON=1
+declare -i CLR_GREEN=2
+declare -i CLR_OLIVE=3
+declare -i CLR_NAVY=4
+declare -i CLR_PURPLE=5
+declare -i CLR_TEAL=6
+declare -i CLR_SILVER=7
+declare -i CLR_GREY=8
+declare -i CLR_RED=9
+declare -i CLR_LIME=10
+declare -i CLR_YELLOW=11
+declare -i CLR_BLUE=12
+declare -i CLR_FUCHSIA=13
+declare -i CLR_AQUA=14
+declare -i CLR_WHITE=15
+
+# ### Scheme
+declare -i BG_TERM="${CLR_BLACK}"
+declare -i FG_LAST_OK="${CLR_LIME}"
+declare -i FG_LAST_ERR="${CLR_RED}"
+declare -i FG_USER="${CLR_LIME}"
+declare -i FG_SEP="${CLR_RED}"
+declare -i FG_HOST="${CLR_LIME}"
+declare -i FG_DIR="${CLR_BLUE}"
+declare -i FG_GIT_CLEAN="${CLR_WHITE}"
+declare -i BG_GIT_CLEAN="${CLR_GREEN}"
+declare -i FG_GIT_DIRTY="${CLR_WHITE}"
+declare -i BG_GIT_DIRTY="${CLR_MAROON}"
+declare -i FG_GIT_STATS="${CLR_MAROON}"
+declare -i FG_GIT_STATS_X="${CLR_GREEN}"
+declare -i FG_GIT_STATS_Y="${CLR_MAROON}"
+declare -i BG_GIT_STATS="${CLR_WHITE}"
+declare -i FG_SYM="${CLR_GREY}"
+declare -i FG_RIGHT="${CLR_GREY}"
+declare -i FG_RIGHT_HL="${CLR_RED}"
+
+# ## Symbols
+declare PS_PL_LAST_OK=$'\u2713'
+declare PS_LAST_OK=√
+declare PS_PL_BRANCH_SYM=$' \ue0a0 '
+declare PS_BRANCH_SYM=' '
+declare PS_PL_TRANS_LEFT=$'\ue0b0'
+declare PS_TRANS_LEFT='>'
+declare PS_PL_TRANS=$'\ue0b2'
+declare PS_TRANS=''
+declare PS_PL_TRANS_2=$'\ue0b3'
+declare PS_TRANS_2='<'
+
+# Global Variables
+# ----------------
+declare ps_last=''
+declare -i ps_last_len
+declare ps_git=''
+declare -i ps_git_len
+declare ps_git_stats=''
+declare -i ps_git_stats_len
+declare -i ps_git_bg
+
+# Last
+# ----
+function ps_last_update() {
+  local -i code="${1}"
+  local ok_sym="${2}"
+
+  if [[ "${code}" -eq 0 ]]; then
+    ps_last="%F{${FG_LAST_OK}}${ok_sym}%f"
+    ps_last_len="${#ok_sym}"
+  else
+    ps_last="%F{${FG_LAST_ERR}}${code}%f"
+    ps_last_len="${#code}"
+  fi
+}
 
 # Git
 # ---
 
-# ### Init
-git_path=$(which git)
+# ## Init
+declare git_path=$(which git)
 
 if [[ "$?" -ne 0 ]]; then
   git_path=''
 fi
 
-# ### print_trans_right
-print_trans_right() {
-  clr_left="${1}"
-  clr_right="${2}"
+# ## ps_git_stats_add
+ps_git_stats_add() {
+  local code="${1}"
+  local -i num_x="${2}"
+  local -i num_y="${3}"
 
-  # Print the rightward transition. The foreground and background color are
-  # set. The background color is not reset so it will effect the text that
-  # follows the transition.
-  print -n "%F{${clr_left}}%K{${clr_right}}\ue0b0%f"
-}
-
-# ### print_git_xy_stats
-print_git_xy_stats() {
-  code="${1}"
-  num_x="${2}"
-  num_y="${3}"
-  res=''
-
-  # Print a leading space, the code and the stats that are available. The
-  # foreground color is set and reset at the end, but the background color is
-  # inherited. This allows stats to be concatenated, then tack on a trailing
-  # space to get balanced paddding, and wrap in a background color.
+  # Add a leading space, the code and the stats that are available to the
+  # global status variable and increment the global length variable by the
+  # number of printable characters added to the status.  The foreground
+  # color is set at the beginning of the addition, and reset at the end of
+  # the addition. The background color is inherited. A trailing space should
+  # be added and the background color should be reset after the last stats.
   if [[ "${num_x}" -gt 0 || "${num_y}" -gt 0 ]]; then
-    res+=" %F{${PS_CLR_GIT_S}}${code}"
+    ps_git_stats+=" %F{${FG_GIT_STATS}}${code}"
+    ps_git_stats_len+=$((1 + ${#code}))
 
-    if [[ "${num_x}" -gt 0 ]]; then res+="%F{${PS_CLR_GIT_S_X}}${num_x}"; fi
-    if [[ "${num_y}" -gt 0 ]]; then
-      res+="%F{${PS_CLR_GIT_S}}:%F{${PS_CLR_GIT_S_Y}}${num_y}"
+    if [[ "${num_x}" -gt 0 ]]; then
+      ps_git_stats+="%F{${FG_GIT_STATS_X}}${num_x}"
+      ps_git_stats_len+=${#num_x}
     fi
 
-    res+='%f'
-  fi
+    if [[ "${num_y}" -gt 0 ]]; then
+      ps_git_stats+="%F{${FG_GIT_STATS}}:%F{${FG_GIT_STATS_Y}}${num_y}"
+      ps_git_stats_len+=$((1 + ${#num_y}))
+    fi
 
-  print -n "${res}"
+    ps_git_stats+='%f'
+  fi
 }
 
-# ### print_git_status
-print_git_status() {
+# ## ps_git_update
+ps_git_update() {
+  local -r trans="${1}"
+  local -r branch_sym="${2}"
+
+  # Init global variables
+  ps_git_stats=''
+  ps_git_stats_len=0
+  ps_git=''
+  ps_git_len=0
+  ps_git_bg=0
+
   # Git is installed
   if [[ -n "${git_path}" ]]; then
-    stat=$("${git_path}" status --porcelain=v2 --branch 2> /dev/null)
+    local data
+
+    # Assign the variable in a separate step from declaring it so we get
+    # the correct last exit code
+    data="$(${git_path} status --porcelain=v2 --branch 2> /dev/null)"
 
     # Inside a repo so generate and output the status
     if [[ "$?" -eq 0 ]]; then
+      local branch
+      local ab
+      local -i a
+      local -i b
+      local -i num_a
+      local -i num_mx
+      local -i num_my
+      local -i num_dx
+      local -i num_dy
+      local -i num_rx
+      local -i num_ry
+      local -i num_cx
+      local -i num_cy
+      local -i num_um
+      local -i num_uax
+      local -i num_uay
+      local -i num_udx
+      local -i num_udy
+      local -i num_u
+      local -i total
+      local -i clr_branch
+      local -ri trans_len=${#trans}
+      local -ri branch_sym_len=${#branch_sym}
+
       # Parse the branch and fallback to a default value
-      branch=${$(print -r "${stat}" \
+      branch=${$(print -r "${data}" \
         | grep -m 1 '^# branch.head ' | cut -b 15-):-???}
 
       # Parse ahead and behind
-      ab=$(print -r "${stat}" | grep -m 1 '^# branch.ab ')
+      ab=$(print -r "${data}" | grep -m 1 '^# branch.ab ')
       a=$(print -r "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
       b=$(print -r "${ab}" | cut -d '-' -f 2)
 
       # Parse the changes
-      num_a=$(print -r "${stat}" | grep -c '^[12] A')
-      num_mx=$(print -r "${stat}" | grep -c '^[12] M')
-      num_my=$(print -r "${stat}" | grep -c '^[12] .M')
-      num_dx=$(print -r "${stat}" | grep -c '^[12] D')
-      num_dy=$(print -r "${stat}" | grep -c '^[12] .D')
-      num_rx=$(print -r "${stat}" | grep -c '^[12] R')
-      num_ry=$(print -r "${stat}" | grep -c '^[12] .R')
-      num_cx=$(print -r "${stat}" | grep -c '^[12] C')
-      num_cy=$(print -r "${stat}" | grep -c '^[12] .C')
-      num_um=$(print -r "${stat}" | grep -c '^u UU')
-      num_uax=$(print -r "${stat}" | grep -c '^u A')
-      num_uay=$(print -r "${stat}" | grep -c '^u .A')
-      num_udx=$(print -r "${stat}" | grep -c '^u D')
-      num_udy=$(print -r "${stat}" | grep -c '^u .D')
-      num_u=$(print -r "${stat}" | grep -c '^? ')
-      total=$(print -r "${stat}" | grep -c '^[12u?] ')
+      num_a=$(print -r "${data}" | grep -c '^[12] A')
+      num_mx=$(print -r "${data}" | grep -c '^[12] M')
+      num_my=$(print -r "${data}" | grep -c '^[12] .M')
+      num_dx=$(print -r "${data}" | grep -c '^[12] D')
+      num_dy=$(print -r "${data}" | grep -c '^[12] .D')
+      num_rx=$(print -r "${data}" | grep -c '^[12] R')
+      num_ry=$(print -r "${data}" | grep -c '^[12] .R')
+      num_cx=$(print -r "${data}" | grep -c '^[12] C')
+      num_cy=$(print -r "${data}" | grep -c '^[12] .C')
+      num_um=$(print -r "${data}" | grep -c '^u UU')
+      num_uax=$(print -r "${data}" | grep -c '^u A')
+      num_uay=$(print -r "${data}" | grep -c '^u .A')
+      num_udx=$(print -r "${data}" | grep -c '^u D')
+      num_udy=$(print -r "${data}" | grep -c '^u .D')
+      num_u=$(print -r "${data}" | grep -c '^? ')
+      total=$(print -r "${data}" | grep -c '^[12u?] ')
 
       # Construct the stats
-      stats=''
 
+      # Ahead
       if [[ -n "${a}" && "${a}" -gt 0 ]]; then
-        stats+=" %F{${PS_CLR_GIT_S}}↑%F{${PS_CLR_GIT_S_X}}${a}%f"
+        ps_git_stats+=" %F{${FG_GIT_STATS}}↑%F{${FG_GIT_STATS_X}}${a}%f"
+        ps_git_stats_len+=$((1 + 1 + ${#a}))
       fi
 
+      # Behind
       if [[ -n "${b}" && "${b}" -gt 0 ]]; then
-        if [[ -z "${stats}" ]]; then stats+=' '; fi
-        stats+="%F{${PS_CLR_GIT_S}}↓%F{${PS_CLR_GIT_S_X}}${b}%f"
+        # But not ahead
+        if [[ -z "${stats}" ]]; then
+          ps_git_stats+=' '
+          ps_git_stats_len+=1
+        fi
+
+        ps_git_stats+="%F{${FG_GIT_S}}↓%F{${FG_GIT_STATS_X}}${b}%f"
+        ps_git_stats_len+=$((1 + ${#b}))
       fi
 
-      stats+=$(print_git_xy_stats 'a' "${num_a}")
-      stats+=$(print_git_xy_stats 'm' "${num_mx}" "${num_my}")
-      stats+=$(print_git_xy_stats 'd' "${num_dx}" "${num_dy}")
-      stats+=$(print_git_xy_stats 'r' "${num_rx}" "${num_ry}")
-      stats+=$(print_git_xy_stats 'c' "${num_cx}" "${num_cy}")
-      stats+=$(print_git_xy_stats 'um' "${num_um}")
-      stats+=$(print_git_xy_stats 'ua' "${num_uax}" "${num_uay}")
-      stats+=$(print_git_xy_stats 'ud' "${num_udx}" "${num_udy}")
-      stats+=$(print_git_xy_stats '?' "${num_u}")
+      ps_git_stats_add 'a' "${num_a}"
+      ps_git_stats_add 'm' "${num_mx}" "${num_my}"
+      ps_git_stats_add 'd' "${num_dx}" "${num_dy}"
+      ps_git_stats_add 'r' "${num_rx}" "${num_ry}"
+      ps_git_stats_add 'c' "${num_cx}" "${num_cy}"
+      ps_git_stats_add 'um' "${num_um}"
+      ps_git_stats_add 'ua' "${num_uax}" "${num_uay}"
+      ps_git_stats_add 'ud' "${num_udx}" "${num_udy}"
+      ps_git_stats_add '?' "${num_u}"
 
-      # Output the status
-      print -n ' ' # Print the leading spacer
+      # Construct the git portion of the prompt, which will vary depending
+      # on whether or not the stats are empty
 
-      # Powerline
-      if [[ -n "${POWERLINE}" ]]; then
-        # Clean branch
-        if [[ "${total}" -eq 0 ]]; then
-          print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_C}"
-          print -n "%F{${PS_CLR_GIT_C}} \ue0a0 ${branch} "
+      # Clean branch
+      if [[ "${total}" -eq 0 ]]; then
+        fg_branch=${FG_GIT_CLEAN}
+        bg_branch=${BG_GIT_CLEAN}
+        ps_git_bg=${BG_GIT_CLEAN}
 
-          if [[ -z "${stats}" ]]; then
-            print_trans_right "${PS_CLR_BG_GIT_C}" "${CLR_BLACK}"
-          else
-            print_trans_right "${PS_CLR_BG_GIT_C}" "${PS_CLR_BG_GIT_S}"
-          fi
-
-        # Dirty branch
-        else
-          print_trans_right "${CLR_BLACK}" "${PS_CLR_BG_GIT_D}"
-          print -n "%F{${PS_CLR_GIT_D}} \ue0a0 ${branch} "
-          print_trans_right "${PS_CLR_BG_GIT_D}" "${PS_CLR_BG_GIT_S}"
-        fi
-
-        # A clean branch will have stats if is ahead or behind. A dirty branch
-        # may not have stats if there are changes we didn't check for, i.e.,
-        # total > 0 and stats = ''.
-        if [[ -n "${stats}" ]]; then
-          print -n "%K{${PS_CLR_BG_GIT_S}}${stats} "
-          print_trans_right "${PS_CLR_BG_GIT_S}" "${CLR_BLACK}"
-        fi
-
-      # No Powerline
+      # Dirty branch
       else
-        # Clean branch
-        if [[ "${total}" -eq 0 ]]; then
-          print -n "%K{${PS_CLR_BG_GIT_C}} %F{${PS_CLR_GIT_C}}${branch} %f%k"
+        fg_branch=${FG_GIT_DIRTY}
+        bg_branch=${BG_GIT_DIRTY}
+        ps_git_bg=${BG_GIT_DIRTY}
+      fi
 
-        # Dirty branch
-        else
-          print -n "%K{${PS_CLR_BG_GIT_D}} %F{${PS_CLR_GIT_D}}${branch} %f%k"
-        fi
+      # Add the branch
+      ps_git+="%K{${BG_TERM}}%F{${bg_branch}}${trans}"
+      ps_git+="%K{${bg_branch}}%F{${fg_branch}}${branch_sym}${branch}%f %k"
+      ps_git_len+=$((${trans_len} + ${branch_sym_len} + ${#branch} + 1))
 
-        # Stats
-        if [[ -n "${stats}" ]]; then
-          print -n "%K{${PS_CLR_BG_GIT_S}}${stats} %k"
-        fi
+      # A clean branch will have stats if is ahead or behind. A dirty branch
+      # may not have stats if there are changes we didn't check for, i.e.,
+      # total > 0 and stats = ''.
+      if [[ -n "${ps_git_stats}" ]]; then
+        ps_git+="%K{${bg_branch}}%F{${BG_GIT_STATS}}${trans}%f"
+        ps_git+="%K{${BG_GIT_STATS}}${ps_git_stats} %k"
+        ps_git_len+=$((${trans_len} + ${ps_git_stats_len} + 1))
       fi
     fi
   fi
-
-  # If we are in a repo we have to output a trailing space, and if we are
-  # not in a repo or Git is not installed, we have to output a space
-  print -n ' '
 }
 
-# Prompt Parts
+# Print Prompt
 # ------------
 
-# ### print_ps_ok
-print_ps_ok() {
+function precmd() {
+  local -i last="$?"
+  local user="$(print -nP '%n')"
+  local sep='@'
+  local host="$(print -nP '%m')"
+  local dir="$(print -nP '%~')"
+  local -i level="$(print -Pn '%L')"
+  local -i num_jobs="$(jobs | wc -l)"
+  local -i fg_sym="${FG_SYM}"
+  local last_ok
+  local left_trans
+  local trans
+  local trans_2
+  local branch_sym
+
+  # User Powerline symbols
   if [[ -n "${POWERLINE}" ]]; then
-    print -n '\u2713'
+    last_ok="${PS_PL_LAST_OK}"
+    left_trans="${PS_PL_TRANS_LEFT}"
+    trans="${PS_PL_TRANS}"
+    trans_2="${PS_PL_TRANS_2}"
+    branch_sym="${PS_PL_BRANCH_SYM}"
+
+  # User regular symbols
   else
-    print -n '√'
+    last_ok="${PS_LAST_OK}"
+    left_trans="${PS_TRANS_LEFT}"
+    trans="${PS_TRANS}"
+    trans_2="${PS_TRANS_2}"
+    branch_sym="${PS_BRANCH_SYM}"
   fi
+
+  # Print the second line of the right prompt
+  RPROMPT=''
+
+  # Show and highlight the shell level if not 1
+  if [[ "${level}" -gt 1 ]]; then
+    fg_sym="${FG_RIGHT_HL}"
+    RPROMPT+="%F{${FG_RIGHT_HL}}${trans_2} L:${level} %f"
+  fi
+
+  # Show and highlight the number of jobs if not 0
+  if [[ "${num_jobs}" -gt 0 ]]; then
+    fg_sym="${FG_RIGHT_HL}"
+    RPROMPT+="%F{${FG_RIGHT_HL}}${trans_2} J:${num_jobs} %f"
+  fi
+
+  RPROMPT+="%F{${FG_RIGHT}}${trans_2} %t %w %f"
+
+  PS1=$'\n'
+
+  # Print the first line of the left prompt
+  ps_last_update "${last}" "${last_ok}"
+  PS1+="${ps_last} %F{${FG_USER}}${user}%F{${FG_SEP}}${sep}"
+  PS1+="%F{${FG_HOST}}${host} %F{${FG_DIR}}${dir}%f"
+
+  # Print the first line of the right prompt
+  ps_git_update "${trans}" "${branch_sym}"
+
+  if [[ -n "${ps_git}" ]]; then
+    local -i ps_left_len=$((${ps_last_len} + 1 + ${#user} + ${#sep} + ${#host} \
+      + 1 + ${#dir}))
+    local -i padding=$((${COLUMNS} - ${ps_left_len} - 1 - ${#left_trans} \
+      - ${ps_git_len} - 1))
+
+    if [[ "${padding}" -gt 0 ]]; then
+      PS1+=" %F{${ps_git_bg}}${left_trans}"
+      PS1+="%F{${FG_SYM}}${(l:$padding::-:)}%f${ps_git}"
+    else
+      PS1+=" ${ps_git}"
+    fi
+  fi
+
+  # Print the newline at the end of the first line
+  PS1+=$'\n'
+
+  # Print the second line of the left prompt
+  PS1+="%F{${fg_sym}}%#%f "
 }
-
-# ### Variables
-
-# Each part will be expanded once when assembled to form the prompt. If any
-# portion of a part needs to be expanded each time the prompt is written,
-# simply don't expand, escape the $ for those portions.
-CR=$'\n'
-PS_LAST="%(?.%F{$PS_CLR_LAST_OK}\$(print_ps_ok).%F{$PS_CLR_LAST_ERR}%?)%f"
-PS_USER="%F{$PS_CLR_USER}%n%f"
-PS_SEP="%F{$PS_CLR_AT}@%f"
-PS_HOST="%F{$PS_CLR_HOST}%m%f"
-PS_DIR="%F{$PS_CLR_DIR}%~%f"
-PS_GIT='$(print_git_status)'
-PS_SYM="%F{$PS_CLR_SYM}%#%f"
-
-# Turn on prompt substitution and assemble the prompt. Use double quotes to
-# expand the prompt parts right away. Dynamic portions have the $ escaped, so
-# they will be expanded each time the prompt is written.
-setopt prompt_subst
-PS1="${CR}"
-PS1+="${PS_LAST} ${PS_USER}${PS_SEP}${PS_HOST} ${PS_DIR}${PS_GIT}${CR}"
-PS1+="${PS_SYM} "
 
 # Aliases
 # =======
