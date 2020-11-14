@@ -326,7 +326,6 @@ function precmd() {
   local sep='@'
   local host="$(print -nP '%m')"
   local dir="$(print -nP '%~')"
-  local -i level="$(print -Pn '%L')"
   local -i num_jobs="$(jobs | wc -l)"
   local -i fg_sym="${FG_SYM}"
   local last_ok
@@ -356,9 +355,9 @@ function precmd() {
   RPROMPT=''
 
   # Show and highlight the shell level if not 1
-  if [[ "${level}" -gt 1 ]]; then
+  if [[ "${SHLVL}" -gt 1 ]]; then
     fg_sym="${FG_RIGHT_HL}"
-    RPROMPT+="%F{${FG_RIGHT_HL}}${trans_2} L:${level} %f"
+    RPROMPT+="%F{${FG_RIGHT_HL}}${trans_2} L:${SHLVL} %f"
   fi
 
   # Show and highlight the number of jobs if not 0
