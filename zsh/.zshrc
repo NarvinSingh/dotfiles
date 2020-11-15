@@ -116,31 +116,6 @@ declare PS_TRANS=''
 declare PS_PL_TRANS_2=$'\ue0b3'
 declare PS_TRANS_2='<'
 
-# Global Variables
-# ----------------
-declare ps_last=''
-declare -i ps_last_len
-declare ps_git=''
-declare -i ps_git_len
-declare ps_git_stats=''
-declare -i ps_git_stats_len
-declare -i ps_git_bg
-
-# Last
-# ----
-function ps_last_update() {
-  local -i code="${1}"
-  local ok_sym="${2}"
-
-  if [[ "${code}" -eq 0 ]]; then
-    ps_last="%F{${FG_LAST_OK}}${ok_sym}%f"
-    ps_last_len="${#ok_sym}"
-  else
-    ps_last="%F{${FG_LAST_ERR}}${code}%f"
-    ps_last_len="${#code}"
-  fi
-}
-
 # Git
 # ---
 
@@ -151,47 +126,33 @@ if [[ "$?" -ne 0 ]]; then
   git_path=''
 fi
 
-# ## ps_git_stats_add
-ps_git_stats_add() {
-  local code="${1}"
-  local -i num_x="${2}"
-  local -i num_y="${3}"
+# ## git_stat
+git_stat() {
+  local code="${1}" num_x="${2}" num_y="${3}"
+  local res=''
 
-  # Add a leading space, the code and the stats that are available to the
-  # global status variable and increment the global length variable by the
-  # number of printable characters added to the status.  The foreground
-  # color is set at the beginning of the addition, and reset at the end of
-  # the addition. The background color is inherited. A trailing space should
-  # be added and the background color should be reset after the last stats.
+  # Print a leading space, the code and the stats that are available.
+  # The foreground color is set at the beginning and reset at the end of
+  # the output. The background color is inherited. A trailing space should
+  # be added and the background color should be reset after the last stat.
   if [[ "${num_x}" -gt 0 || "${num_y}" -gt 0 ]]; then
-    ps_git_stats+=" %F{${FG_GIT_STATS}}${code}"
-    ps_git_stats_len+=$((1 + ${#code}))
+    res+=" %F{${FG_GIT_STATS}}${code}"
 
-    if [[ "${num_x}" -gt 0 ]]; then
-      ps_git_stats+="%F{${FG_GIT_STATS_X}}${num_x}"
-      ps_git_stats_len+=${#num_x}
-    fi
+    if [[ "${num_x}" -gt 0 ]]; then res+="%F{${FG_GIT_STATS_X}}${num_x}"; fi
 
     if [[ "${num_y}" -gt 0 ]]; then
-      ps_git_stats+="%F{${FG_GIT_STATS}}:%F{${FG_GIT_STATS_Y}}${num_y}"
-      ps_git_stats_len+=$((1 + ${#num_y}))
+      res+="%F{${FG_GIT_STATS}}:%F{${FG_GIT_STATS_Y}}${num_y}"
     fi
 
-    ps_git_stats+='%f'
+    res+='%f'
   fi
+
+  print -n "${res}"
 }
 
-# ## ps_git_update
-ps_git_update() {
-  local -r trans="${1}"
-  local -r branch_sym="${2}"
-
-  # Init global variables
-  ps_git_stats=''
-  ps_git_stats_len=0
-  ps_git=''
-  ps_git_len=0
-  ps_git_bg=0
+# ## git_status
+git_status() {
+  local -r trans="${1}" branch_sym="${2}"
 
   # Git is installed
   if [[ -n "${git_path}" ]]; then
@@ -203,35 +164,18 @@ ps_git_update() {
 
     # Inside a repo so generate and output the status
     if [[ "$?" -eq 0 ]]; then
-      local branch
-      local ab
-      local -i a
-      local -i b
-      local -i num_a
-      local -i num_mx
-      local -i num_my
-      local -i num_dx
-      local -i num_dy
-      local -i num_rx
-      local -i num_ry
-      local -i num_cx
-      local -i num_cy
-      local -i num_um
-      local -i num_uax
-      local -i num_uay
-      local -i num_udx
-      local -i num_udy
-      local -i num_u
-      local -i total
-      local -i clr_branch
+      local branch ab
+      local -i a b num_a num_mx num_my num_dx num_dy num_rx num_ry num_cx \
+        num_cy num_um num_uax num_uay num_udx num_udy num_u total clr_branch
       local -ri trans_len=${#trans}
       local -ri branch_sym_len=${#branch_sym}
+      local stats='' res='' is_clean=''
 
       # Parse the branch and fallback to a default value
       branch=${$(print -r "${data}" \
         | grep -m 1 '^# branch.head ' | cut -b 15-):-???}
 
-      # Parse ahead and behind
+      # Parse the ahead and behind info
       ab=$(print -r "${data}" | grep -m 1 '^# branch.ab ')
       a=$(print -r "${ab}" | cut -d '+' -f 2 | cut -d ' ' -f 1)
       b=$(print -r "${ab}" | cut -d '-' -f 2)
@@ -258,61 +202,56 @@ ps_git_update() {
 
       # Ahead
       if [[ -n "${a}" && "${a}" -gt 0 ]]; then
-        ps_git_stats+=" %F{${FG_GIT_STATS}}↑%F{${FG_GIT_STATS_X}}${a}%f"
-        ps_git_stats_len+=$((1 + 1 + ${#a}))
+        stats+=" %F{${FG_GIT_STATS}}↑%F{${FG_GIT_STATS_X}}${a}%f"
       fi
 
       # Behind
       if [[ -n "${b}" && "${b}" -gt 0 ]]; then
         # But not ahead
-        if [[ -z "${stats}" ]]; then
-          ps_git_stats+=' '
-          ps_git_stats_len+=1
-        fi
+        if [[ -z "${stats}" ]]; then stats+=' '; fi
 
-        ps_git_stats+="%F{${FG_GIT_S}}↓%F{${FG_GIT_STATS_X}}${b}%f"
-        ps_git_stats_len+=$((1 + ${#b}))
+        stats+="%F{${FG_GIT_S}}↓%F{${FG_GIT_STATS_X}}${b}%f"
       fi
 
-      ps_git_stats_add 'a' "${num_a}"
-      ps_git_stats_add 'm' "${num_mx}" "${num_my}"
-      ps_git_stats_add 'd' "${num_dx}" "${num_dy}"
-      ps_git_stats_add 'r' "${num_rx}" "${num_ry}"
-      ps_git_stats_add 'c' "${num_cx}" "${num_cy}"
-      ps_git_stats_add 'um' "${num_um}"
-      ps_git_stats_add 'ua' "${num_uax}" "${num_uay}"
-      ps_git_stats_add 'ud' "${num_udx}" "${num_udy}"
-      ps_git_stats_add '?' "${num_u}"
+      stats+=$(git_stat 'a' "${num_a}")
+      stats+=$(git_stat 'm' "${num_mx}" "${num_my}")
+      stats+=$(git_stat 'd' "${num_dx}" "${num_dy}")
+      stats+=$(git_stat 'r' "${num_rx}" "${num_ry}")
+      stats+=$(git_stat 'c' "${num_cx}" "${num_cy}")
+      stats+=$(git_stat 'um' "${num_um}")
+      stats+=$(git_stat 'ua' "${num_uax}" "${num_uay}")
+      stats+=$(git_stat 'ud' "${num_udx}" "${num_udy}")
+      stats+=$(git_stat '?' "${num_u}")
 
       # Construct the git portion of the prompt, which will vary depending
       # on whether or not the stats are empty
 
       # Clean branch
       if [[ "${total}" -eq 0 ]]; then
+        is_clean=1
         fg_branch=${FG_GIT_CLEAN}
         bg_branch=${BG_GIT_CLEAN}
-        ps_git_bg=${BG_GIT_CLEAN}
 
       # Dirty branch
       else
+        is_clean=0
         fg_branch=${FG_GIT_DIRTY}
         bg_branch=${BG_GIT_DIRTY}
-        ps_git_bg=${BG_GIT_DIRTY}
       fi
 
       # Add the branch
-      ps_git+="%K{${BG_TERM}}%F{${bg_branch}}${trans}"
-      ps_git+="%K{${bg_branch}}%F{${fg_branch}}${branch_sym}${branch}%f %k"
-      ps_git_len+=$((${trans_len} + ${branch_sym_len} + ${#branch} + 1))
+      res+="%K{${BG_TERM}}%F{${bg_branch}}${trans}"
+      res+="%K{${bg_branch}}%F{${fg_branch}}${branch_sym}${branch}%f %k"
 
       # A clean branch will have stats if is ahead or behind. A dirty branch
       # may not have stats if there are changes we didn't check for, i.e.,
       # total > 0 and stats = ''.
-      if [[ -n "${ps_git_stats}" ]]; then
-        ps_git+="%K{${bg_branch}}%F{${BG_GIT_STATS}}${trans}%f"
-        ps_git+="%K{${BG_GIT_STATS}}${ps_git_stats} %k"
-        ps_git_len+=$((${trans_len} + ${ps_git_stats_len} + 1))
+      if [[ -n "${stats}" ]]; then
+        res+="%K{${bg_branch}}%F{${BG_GIT_STATS}}${trans}%f"
+        res+="%K{${BG_GIT_STATS}}${stats} %k"
       fi
+
+      print "${res}\n${is_clean}"
     fi
   fi
 }
@@ -320,19 +259,20 @@ ps_git_update() {
 # Print Prompt
 # ------------
 
+# ## print_len
+function print_len() {
+  local str="$1"
+
+  # Strip the color, bold, underline and standout codes from the string and
+  # print its length
+  print -n ${#${(S%%)str//\%([KF]\{*\}|[kfBUSbus])}}
+}
+
+# ## precmd
 function precmd() {
+  # Get the last error code right away before another exit code overwrites it
   local -i last="$?"
-  local user="$(print -nP '%n')"
-  local sep='@'
-  local host="$(print -nP '%m')"
-  local dir="$(print -nP '%~')"
-  local -i num_jobs="$(jobs | wc -l)"
-  local -i fg_sym="${FG_SYM}"
-  local last_ok
-  local left_trans
-  local trans
-  local trans_2
-  local branch_sym
+  local last_ok left_trans trans trans_2 branch_sym
 
   # User Powerline symbols
   if [[ -n "${POWERLINE}" ]]; then
@@ -351,52 +291,58 @@ function precmd() {
     branch_sym="${PS_BRANCH_SYM}"
   fi
 
-  # Print the second line of the right prompt
-  RPROMPT=''
-
-  # Show and highlight the shell level if not 1
-  if [[ "${SHLVL}" -gt 1 ]]; then
-    fg_sym="${FG_RIGHT_HL}"
-    RPROMPT+="%F{${FG_RIGHT_HL}}${trans_2} L:${SHLVL} %f"
-  fi
-
-  # Show and highlight the number of jobs if not 0
-  if [[ "${num_jobs}" -gt 0 ]]; then
-    fg_sym="${FG_RIGHT_HL}"
-    RPROMPT+="%F{${FG_RIGHT_HL}}${trans_2} J:${num_jobs} %f"
-  fi
-
-  RPROMPT+="%F{${FG_RIGHT}}${trans_2} %t %w %f"
-
+  # Print the blank line between the end of the previous command and this prompt
+  # TODO: Remove blank line when this is the first prompt on the screen
   PS1=$'\n'
 
   # Print the first line of the left prompt
-  ps_last_update "${last}" "${last_ok}"
-  PS1+="${ps_last} %F{${FG_USER}}${user}%F{${FG_SEP}}${sep}"
-  PS1+="%F{${FG_HOST}}${host} %F{${FG_DIR}}${dir}%f"
+  local l
+
+  # Format the last exit code info based on the value we captured at the
+  # beginning of the function
+  if [[ "${last}" -eq 0 ]]; then l=$(print -n "%F{${FG_LAST_OK}}${last_ok}%f")
+  else l=$(print -n "%F{${FG_LAST_ERR}}${last}%f"); fi
+
+  PS1+="${l} %F{${FG_USER}}%n%F{${FG_SEP}}@%F{${FG_HOST}}%m %F{${FG_DIR}}%~%f"
 
   # Print the first line of the right prompt
-  ps_git_update "${trans}" "${branch_sym}"
+  local g is_clean
 
-  if [[ -n "${ps_git}" ]]; then
-    local -i ps_left_len=$((${ps_last_len} + 1 + ${#user} + ${#sep} + ${#host} \
-      + 1 + ${#dir}))
-    local -i padding=$((${COLUMNS} - ${ps_left_len} - 1 - ${#left_trans} \
-      - ${ps_git_len} - 1))
+  {
+    read -r g
+    read -r is_clean
+  } < <(git_status "${trans}" "${branch_sym}")
+
+  # Only print this part of the prompt if there is a git status
+  if [[ -n "${g}" ]]; then
+    local -i padding=$((${COLUMNS} - $(print_len ${PS1}) + 1 - 1 \
+      - ${#left_trans} - $(print_len ${g}) - 1))
 
     if [[ "${padding}" -gt 0 ]]; then
-      PS1+=" %F{${ps_git_bg}}${left_trans}"
-      PS1+="%F{${FG_SYM}}${(l:$padding::-:)}%f${ps_git}"
+      if [[ "${is_clean}" -eq 1 ]]; then trans_fg="${BG_GIT_CLEAN}"
+      else trans_fg="${BG_GIT_DIRTY}"; fi
+
+      PS1+=" %F{${trans_fg}}${left_trans}"
+      PS1+="%F{${FG_SYM}}${(l:$padding::-:)}%f${g}"
     else
-      PS1+=" ${ps_git}"
+      PS1+=" ${g}"
     fi
   fi
 
   # Print the newline at the end of the first line
   PS1+=$'\n'
 
-  # Print the second line of the left prompt
-  PS1+="%F{${fg_sym}}%#%f "
+  # Print the second line of the left prompt and highlight if if the second
+  # line of the right prompt would have any highlights
+  PS1+="%F{${FG_SYM}}%(1j.%F{${FG_RIGHT_HL}}.)%(2L.%F{${FG_RIGHT_HL}}.)%#%f "
+
+  # Print the second line of the right prompt along with any highlights
+  RPROMPT=''
+  # Show and highlight the number of jobs if not 0
+  RPROMPT+="%(1j.%F{${FG_RIGHT_HL}}${trans_2} J:%j %f.)"
+  # Show and highlight the shell level if not 1
+  RPROMPT+="%(2L.%F{${FG_RIGHT_HL}}${trans_2} L:%L %f.)"
+  RPROMPT+="%F{${FG_RIGHT}}${trans_2} %t %w %f"
 }
 
 # Aliases
