@@ -167,8 +167,6 @@ git_status() {
       local branch ab
       local -i a b num_a num_mx num_my num_dx num_dy num_rx num_ry num_cx \
         num_cy num_um num_uax num_uay num_udx num_udy num_u total clr_branch
-      local -ri trans_len=${#trans}
-      local -ri branch_sym_len=${#branch_sym}
       local stats='' res='' is_clean=''
 
       # Parse the branch and fallback to a default value
