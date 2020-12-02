@@ -258,7 +258,7 @@ git_status() {
 # ------------
 
 # ## print_len
-function print_len() {
+print_len() {
   local str="$1"
 
   # Strip the color, bold, underline and standout codes from the string and
@@ -267,7 +267,7 @@ function print_len() {
 }
 
 # ## precmd
-function precmd() {
+precmd() {
   # Get the last error code right away before another exit code overwrites it
   local -i last="$?"
   local last_ok left_trans trans trans_2 branch_sym
