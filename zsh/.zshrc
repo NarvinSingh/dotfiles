@@ -170,8 +170,8 @@ git_status() {
       local stats='' res='' is_clean=''
 
       # Parse the branch and fallback to a default value
-      branch=${$(print -r "${data}" \
-        | grep -m 1 '^# branch.head ' | cut -b 15-):-???}
+      branch="${$(print -r "${data}" \
+        | grep -m 1 '^# branch.head ' | cut -b 15-):-???}"
 
       # Parse the ahead and behind info
       ab=$(print -r "${data}" | grep -m 1 '^# branch.ab ')
