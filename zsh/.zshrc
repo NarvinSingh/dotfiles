@@ -313,6 +313,14 @@ precmd() {
 
   # Only print this part of the prompt if there is a git status
   if [[ -n "${g}" ]]; then
+    # padding = the total columns
+    # - the printable length of PS1
+    # + 1 for the newline at the beginning of PS1 which shouldn't be counted
+    #   as part of the length of PS1
+    # - 1 for the space after PS1
+    # - the length of the left transition
+    # - the printable length of the git status
+    # - 1 for a right margin
     local -i padding=$((${COLUMNS} - $(print_len "${PS1}") + 1 - 1 \
       - ${#left_trans} - $(print_len "${g}") - 1))
 
