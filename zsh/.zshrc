@@ -313,8 +313,8 @@ precmd() {
 
   # Only print this part of the prompt if there is a git status
   if [[ -n "${g}" ]]; then
-    local -i padding=$((${COLUMNS} - $(print_len ${PS1}) + 1 - 1 \
-      - ${#left_trans} - $(print_len ${g}) - 1))
+    local -i padding=$((${COLUMNS} - $(print_len "${PS1}") + 1 - 1 \
+      - ${#left_trans} - $(print_len "${g}") - 1))
 
     if [[ "${padding}" -gt 0 ]]; then
       if [[ "${is_clean}" -eq 1 ]]; then trans_fg="${BG_GIT_CLEAN}"
