@@ -92,6 +92,7 @@ declare -i FG_USER="${CLR_LIME}"
 declare -i FG_SEP="${CLR_RED}"
 declare -i FG_HOST="${CLR_LIME}"
 declare -i FG_DIR="${CLR_BLUE}"
+declare -i FG_LDR="${CLR_GREY}"
 declare -i FG_GIT_CLEAN="${CLR_WHITE}"
 declare -i BG_GIT_CLEAN="${CLR_GREEN}"
 declare -i FG_GIT_DIRTY="${CLR_WHITE}"
@@ -329,7 +330,7 @@ precmd() {
       else trans_fg="${BG_GIT_DIRTY}"; fi
 
       PS1+=" %F{${trans_fg}}${left_trans}"
-      PS1+="%F{${FG_SYM}}${(l:$padding::-:)}%f${g}"
+      PS1+="%F{${FG_LDR}}${(l:$padding::-:)}%f${g}"
     else
       PS1+=" ${g}"
     fi
