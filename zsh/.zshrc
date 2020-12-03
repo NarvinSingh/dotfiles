@@ -128,7 +128,7 @@ fi
 
 # ## git_stat
 git_stat() {
-  local code="${1}" num_x="${2}" num_y="${3}"
+  local -r code="${1}" num_x="${2}" num_y="${3}"
   local res=''
 
   # Print a leading space, the code and the stats that are available.
@@ -259,7 +259,7 @@ git_status() {
 
 # ## print_len
 print_len() {
-  local str="$1"
+  local -r str="$1"
 
   # Strip the color, bold, underline and standout codes from the string and
   # print its length
@@ -269,7 +269,7 @@ print_len() {
 # ## precmd
 precmd() {
   # Get the last error code right away before another exit code overwrites it
-  local -i last="$?"
+  local -ri last="$?"
   local last_ok left_trans trans trans_2 branch_sym
 
   # User Powerline symbols
