@@ -67,35 +67,32 @@ declare -i CLR_AQUA=14
 declare -i CLR_WHITE=15
 
 # ### Scheme
-declare BF_RESET="\[$(tput sgr0)\]"
-declare BG_TERM="\[$(tput setab ${CLR_BLACK})\]"
-declare FG_LAST_OK="\[$(tput setaf ${CLR_LIME})\]"
-declare FG_LAST_ERR="\[$(tput setaf ${CLR_RED})\]"
-declare FG_USER="\[$(tput setaf ${CLR_LIME})\]"
-declare FG_SEP="\[$(tput setaf ${CLR_RED})\]"
-declare FG_HOST="\[$(tput setaf ${CLR_LIME})\]"
-declare FG_DIR="\[$(tput setaf ${CLR_BLUE})\]"
-declare FG_LDR="\[$(tput setaf ${CLR_GREY})\]"
-declare FG_GIT_CLEAN="\[$(tput setaf ${CLR_WHITE})\]"
-declare FBG_GIT_CLEAN="\[$(tput setab ${CLR_WHITE})\]"
-declare BG_GIT_CLEAN="\[$(tput setab ${CLR_GREEN})\]"
-declare BFG_GIT_CLEAN="\[$(tput setaf ${CLR_GREEN})\]"
-declare FG_GIT_DIRTY="\[$(tput setaf ${CLR_WHITE})\]"
-declare FBG_GIT_DIRTY="\[$(tput setab ${CLR_WHITE})\]"
-declare BG_GIT_DIRTY="\[$(tput setab ${CLR_MAROON})\]"
-declare BFG_GIT_DIRTY="\[$(tput setaf ${CLR_MAROON})\]"
-declare FG_GIT_STATS="\[$(tput setaf ${CLR_MAROON})\]"
-declare FG_GIT_STATS_X="\[$(tput setaf ${CLR_GREEN})\]"
-declare FG_GIT_STATS_Y="\[$(tput setaf ${CLR_MAROON})\]"
-declare BG_GIT_STATS="\[$(tput setab ${CLR_WHITE})\]"
-declare BFG_GIT_STATS="\[$(tput setaf ${CLR_WHITE})\]"
-declare FG_SYM="\[$(tput setaf ${CLR_GREY})\]"
-declare FG_RIGHT="\[$(tput setaf ${CLR_GREY})\]"
-declare FG_RIGHT_HL="\[$(tput setaf ${CLR_RED})\]"
-declare BG_RIGHT_HL="\[$(tput setab ${CLR_RED})\]"
-declare FG_SHELL="\[$(tput setaf ${CLR_WHITE})\]"
-declare BG_SHELL="\[$(tput setab ${CLR_BLUE})\]"
-declare BFG_SHELL="\[$(tput setaf ${CLR_BLUE})\]"
+declare PS_RESET="\[$(tput sgr0)\]"
+declare PS_BG_TERM="\[$(tput setab ${CLR_BLACK})\]"
+declare PS_FG_LAST_OK="\[$(tput setaf ${CLR_LIME})\]"
+declare PS_FG_LAST_ERR="\[$(tput setaf ${CLR_RED})\]"
+declare PS_FG_USER="\[$(tput setaf ${CLR_LIME})\]"
+declare PS_FG_SEP="\[$(tput setaf ${CLR_RED})\]"
+declare PS_FG_HOST="\[$(tput setaf ${CLR_LIME})\]"
+declare PS_FG_DIR="\[$(tput setaf ${CLR_BLUE})\]"
+declare PS_FG_LDR="\[$(tput setaf ${CLR_GREY})\]"
+declare PS_FG_GIT_CLEAN="\[$(tput setaf ${CLR_WHITE})\]"
+declare PS_BG_GIT_CLEAN="\[$(tput setab ${CLR_GREEN})\]"
+declare PS_BFG_GIT_CLEAN="\[$(tput setaf ${CLR_GREEN})\]"
+declare PS_FG_GIT_DIRTY="\[$(tput setaf ${CLR_WHITE})\]"
+declare PS_BG_GIT_DIRTY="\[$(tput setab ${CLR_MAROON})\]"
+declare PS_BFG_GIT_DIRTY="\[$(tput setaf ${CLR_MAROON})\]"
+declare PS_FG_GIT_STATS="\[$(tput setaf ${CLR_MAROON})\]"
+declare PS_FG_GIT_STATS_X="\[$(tput setaf ${CLR_GREEN})\]"
+declare PS_FG_GIT_STATS_Y="\[$(tput setaf ${CLR_MAROON})\]"
+declare PS_BG_GIT_STATS="\[$(tput setab ${CLR_WHITE})\]"
+declare PS_BFG_GIT_STATS="\[$(tput setaf ${CLR_WHITE})\]"
+declare PS_FG_SYM="\[$(tput setaf ${CLR_GREY})\]"
+declare PS_FG_RIGHT="\[$(tput setaf ${CLR_GREY})\]"
+declare PS_FG_RIGHT_HL="\[$(tput setaf ${CLR_RED})\]"
+declare PS_BG_RIGHT_HL="\[$(tput setab ${CLR_RED})\]"
+declare PS_BG_SHELL="\[$(tput setab ${CLR_BLUE})\]"
+declare PS_BFG_SHELL="\[$(tput setaf ${CLR_BLUE})\]"
 
 # ## Symbols
 declare PS_PL_LAST_OK=$'\u2713'
@@ -132,15 +129,15 @@ git_stat() {
   # the output. The background color is inherited. A trailing space should
   # be added and the background color should be reset after the last stat.
   if [[ "${num_x}" -gt 0 || "${num_y}" -gt 0 ]]; then
-    res+=" ${FG_GIT_STATS}${code}"
+    res+=" ${PS_FG_GIT_STATS}${code}"
 
-    if [[ "${num_x}" -gt 0 ]]; then res+="${FG_GIT_STATS_X}${num_x}"; fi
+    if [[ "${num_x}" -gt 0 ]]; then res+="${PS_FG_GIT_STATS_X}${num_x}"; fi
 
     if [[ "${num_y}" -gt 0 ]]; then
-      res+="${FG_GIT_STATS}:${FG_GIT_STATS_Y}${num_y}"
+      res+="${PS_FG_GIT_STATS}:${PS_FG_GIT_STATS_Y}${num_y}"
     fi
 
-    #res+="${BF_RESET}"
+    #res+="${PS_RESET}"
   fi
 
   printf "${res}"
@@ -197,7 +194,7 @@ git_status() {
 
       # Ahead
       if [[ -n "${a}" && "${a}" -gt 0 ]]; then
-        stats+=" ${FG_GIT_STATS}↑${FG_GIT_STATS_X}${a}"
+        stats+=" ${PS_FG_GIT_STATS}↑${PS_FG_GIT_STATS_X}${a}"
       fi
 
       # Behind
@@ -205,7 +202,7 @@ git_status() {
         # But not ahead
         if [[ -z "${stats}" ]]; then stats+=' '; fi
 
-        stats+="${FG_GIT_S}↓${FG_GIT_STATS_X}${b}"
+        stats+="${PS_FG_GIT_S}↓${PS_FG_GIT_STATS_X}${b}"
       fi
 
       stats+=$(git_stat 'a' "${num_a}")
@@ -224,28 +221,28 @@ git_status() {
       # Clean branch
       if [[ "${total}" -eq 0 ]]; then
         is_clean=1
-        fg_branch=${FG_GIT_CLEAN}
-        bfg_branch=${BFG_GIT_CLEAN}
-        bg_branch=${BG_GIT_CLEAN}
+        fg_branch=${PS_FG_GIT_CLEAN}
+        bfg_branch=${PS_BFG_GIT_CLEAN}
+        bg_branch=${PS_BG_GIT_CLEAN}
 
       # Dirty branch
       else
         is_clean=0
-        fg_branch=${FG_GIT_DIRTY}
-        bfg_branch=${BFG_GIT_DIRTY}
-        bg_branch=${BG_GIT_DIRTY}
+        fg_branch=${PS_FG_GIT_DIRTY}
+        bfg_branch=${PS_BFG_GIT_DIRTY}
+        bg_branch=${PS_BG_GIT_DIRTY}
       fi
 
       # Add the branch
-      res+="${BG_TERM}${bfg_branch}${trans}"
-      res+="${bg_branch}${fg_branch}${branch_sym}${branch} ${BF_RESET}"
+      res+="${PS_BG_TERM}${bfg_branch}${trans}"
+      res+="${bg_branch}${fg_branch}${branch_sym}${branch} ${PS_RESET}"
 
       # A clean branch will have stats if is ahead or behind. A dirty branch
       # may not have stats if there are changes we didn't check for, i.e.,
       # total > 0 and stats = ''.
       if [[ -n "${stats}" ]]; then
-        res+="${bg_branch}${BFG_GIT_STATS}${trans}${BF_RESET}"
-        res+="${BG_GIT_STATS}${stats} ${BF_RESET}"
+        res+="${bg_branch}${PS_BFG_GIT_STATS}${trans}${PS_RESET}"
+        res+="${PS_BG_GIT_STATS}${stats} ${PS_RESET}"
       fi
 
       printf "${res}\n${is_clean}"
@@ -302,15 +299,15 @@ prompt_command() {
   # Add the first line of the left prompt
 
   # Format the last exit code
-  if [[ "${last}" -eq 0 ]]; then PS1+="${FG_LAST_OK}${last_ok}${BF_RESET} "
-  else PS1+="${FG_LAST_ERR}${last}${BF_RESET} "; fi
+  if [[ "${last}" -eq 0 ]]; then PS1+="${PS_FG_LAST_OK}${last_ok}${PS_RESET} "
+  else PS1+="${PS_FG_LAST_ERR}${last}${PS_RESET} "; fi
 
   # Use environment variables instead of the prompt escape sequences because
   # the variables will be expanded now so the prompt length can be calculated
-  PS1+="${FG_USER}${USER}"
-  PS1+="${FG_SEP}@"
-  PS1+="${FG_HOST}${HOSTNAME%%.*} "
-  PS1+="${FG_DIR}${PWD/#${HOME}/\~}${BF_RESET}"
+  PS1+="${PS_FG_USER}${USER}"
+  PS1+="${PS_FG_SEP}@"
+  PS1+="${PS_FG_HOST}${HOSTNAME%%.*} "
+  PS1+="${PS_FG_DIR}${PWD/#${HOME}/\~}${PS_RESET}"
 
   # Add the first line of the middle and right prompts
   local g is_clean mps rps
@@ -322,51 +319,52 @@ prompt_command() {
 
   # Only add this part of the prompt if there is a git status
   if [[ -n "${g}" ]]; then
-    if [[ "${is_clean}" -eq 1 ]]; then trans_fg="${BFG_GIT_CLEAN}"
-    else trans_fg="${BFG_GIT_DIRTY}"; fi
+    if [[ "${is_clean}" -eq 1 ]]; then trans_fg="${PS_BFG_GIT_CLEAN}"
+    else trans_fg="${PS_BFG_GIT_DIRTY}"; fi
     rps="${g} "
-    mps=" ${trans_fg}${left_trans}${FG_LDR}"
+    mps=" ${trans_fg}${left_trans}${PS_FG_LDR}"
     ldr="${PS_LDR}"
   fi
 
   # Add the secondary info part of the right prompt
-  local bg_shell="${BG_SHELL}" bfg_shell="${BFG_SHELL}" fg_sym="${FG_SYM}"
+  local bg_shell="${PS_BG_SHELL}" bfg_shell="${PS_BFG_SHELL}" \
+    fg_sym="${PS_FG_SYM}"
   local -ri j=$(jobs | wc -l)
 
   if [[ "${j}" -gt 0 ]]; then
-    bg_shell="${BG_RIGHT_HL}"
-    bfg_shell="${FG_RIGHT_HL}"
-    fg_sym="${FG_RIGHT_HL}"
-    rps+="${FG_RIGHT_HL}${trans_2} J:${j} ${BF_RESET}"
+    bg_shell="${PS_BG_RIGHT_HL}"
+    bfg_shell="${PS_FG_RIGHT_HL}"
+    fg_sym="${PS_FG_RIGHT_HL}"
+    rps+="${PS_FG_RIGHT_HL}${trans_2} J:${j} ${PS_RESET}"
   fi
 
   if [[ "${SHLVL}" -gt 1 ]]; then
-    bg_shell="${BG_RIGHT_HL}"
-    bfg_shell="${FG_RIGHT_HL}"
-    fg_sym="${FG_RIGHT_HL}"
-    rps+="${FG_RIGHT_HL}${trans_2} L:${SHLVL} ${BF_RESET}"
+    bg_shell="${PS_BG_RIGHT_HL}"
+    bfg_shell="${PS_FG_RIGHT_HL}"
+    fg_sym="${PS_FG_RIGHT_HL}"
+    rps+="${PS_FG_RIGHT_HL}${trans_2} L:${SHLVL} ${PS_RESET}"
   fi
 
-  rps+="${FG_RIGHT}${trans_2} \D{%I:%M%p %a %d}${BF_RESET}"
+  rps+="${PS_FG_RIGHT}${trans_2} \D{%I:%M%p %a %d}${PS_RESET}"
 
   # There is no git status, but there is highlighted secondary info, so set
   # the middle prompt transition
-  if [[ -z "${mps}" && "${fg_sym}" == "${FG_RIGHT_HL}" ]]; then
-    mps=" ${FG_RIGHT_HL}${left_trans_2}${FG_LDR}"
+  if [[ -z "${mps}" && "${fg_sym}" == "${PS_FG_RIGHT_HL}" ]]; then
+    mps=" ${PS_FG_RIGHT_HL}${left_trans_2}${PS_FG_LDR}"
     ldr="${PS_LDR}"
   fi
 
   # Add the leader to the middle prompt to push the right prompt out
   local -ri ldr_len=$((${COLUMNS} - $(prompt_len "${PS1}${mps}${rps}") + 1 + 1))
   for ((i=0; i<${ldr_len}; i++)); do mps+="${ldr}"; done
-  mps+="${BF_RESET}"
+  mps+="${PS_RESET}"
 
   PS1+="${mps}${rps}\n"
 
   # Print the second line of the prompt
-  PS1+="${bg_shell} ${fg_shell}bash ${BF_RESET}"
-  PS1+="${bfg_shell}${left_trans_3}${BF_RESET} "
-  PS1+="${fg_sym}\$${BF_RESET} "
+  PS1+="${bg_shell} ${fg_shell}bash ${PS_RESET}"
+  PS1+="${bfg_shell}${left_trans_3}${PS_RESET} "
+  PS1+="${fg_sym}\$${PS_RESET} "
 }
 
 PROMPT_COMMAND='prompt_command "$?"'
