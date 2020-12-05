@@ -1,0 +1,27 @@
+# Aliases
+# =======
+
+# ls
+# --
+alias ls='ls --color=auto'
+alias l='ls -al'
+alias la='ls -A'
+alias ll='ls -l'
+
+# cp
+# --
+alias cp='cp -i'
+
+# rm
+# --
+alias rm='rm -i'
+
+# tmux
+# ----
+alias t='tmux'
+
+# vim
+# ---
+alias v='vim'
+alias vv='v -u NONE'
+
