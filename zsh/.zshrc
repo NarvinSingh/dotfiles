@@ -10,7 +10,7 @@ autoload -Uz compinit
 # Environment
 # ===========
 
-# XDG Base Directory Specificatio
+# XDG Base Directory Specification
 # --------------------------------
 
 # See
