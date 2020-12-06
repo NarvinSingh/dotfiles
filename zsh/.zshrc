@@ -1,11 +1,7 @@
-# Lines configured by zsh-newuser-install
-bindkey -v
-# End of lines configured by zsh-newuser-install
-# The following lines were added by compinstall
-zstyle :compinstall filename '/home/narvin/.zshrc'
-
+# Compinstall
+# ===========
+zstyle :compinstall filename "${XDG_CONFIG_HOME}/zsh/.zshrc"
 autoload -Uz compinit
-# End of lines added by compinstall
 
 # Environment
 # ===========
@@ -46,6 +42,10 @@ alias tmux='tmux -f ~/.config/tmux/tmux.conf'
 # ----------------
 mkdir -p "${XDG_CACHE_HOME}"/less
 export LESSHISTFILE="${XDG_CACHE_HOME}/less/history"
+
+# Bindings
+# ========
+bindkey -v
 
 # History
 # =======
